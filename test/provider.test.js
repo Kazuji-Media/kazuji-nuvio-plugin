@@ -64,3 +64,9 @@ test('native quality defaults reflect existing text selections when migrating',(
   assert.equal(toggles.length,5);
   assert.deepEqual(Array.from(toggles.filter(x=>x.defaultValue),x=>x.key),['quality1080','quality720']);
 });
+
+test('native settings accept a configured manifest with internal commas',async()=>{
+  const url='https://torrentio.strem.fun/qualityfilter=threed,480p,scr,cam,unknown|torbox=TEST_ONLY/manifest.json';
+  const rows=await qualityPlugin({manifests:url,qualities:'1080'}).getStreams('123','movie');
+  assert.deepEqual(Array.from(rows,row=>row.quality),['1080p']);
+});

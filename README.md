@@ -78,6 +78,8 @@ Exemplo de campo Manifestos (URLs ilustrativas, substitua):
 ]
 ```
 
+Aceita uma URL inteira, várias por linha ou separadas por vírgula. Vírgulas internas de uma URL configurada (por exemplo `qualityfilter=threed,480p,scr,cam,unknown`) são preservadas: a vírgula separa fontes somente quando é seguida de outra URL HTTP(S). Para URLs com separadores ambíguos, use o array JSON acima. Em versões anteriores a 1.1.2, URLs com vírgulas internas exigem esse array JSON.
+
 O plugin usa `SCRAPER_SETTINGS`, exporta `onSettings()` e aproveita `TMDB_API_KEY` fornecida pelo Nuvio. Consulte [os contratos verificados](docs/NUVIO.md) antes de usar builds antigos.
 
 ## Instalar o add-on HTTP com TorBox opcional
