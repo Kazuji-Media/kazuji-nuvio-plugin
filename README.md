@@ -4,7 +4,7 @@ Agregador completo de **add-ons Stremio HTTP**, com duas formas de instalação 
 
 | Instalação | Onde executa | Hospedagem | TorBox já conectado ao Nuvio |
 | --- | --- | --- | --- |
-| Plugin JavaScript | No aparelho, Nuvio Mobile Full com runtime assíncrono | Manifesto e JS estáticos; GitHub Pages funciona | Não: essa API do app não é exposta ao plugin |
+| Plugin JavaScript | No aparelho, Nuvio Mobile Full com runtime assíncrono | Manifesto e JS estáticos; GitHub Pages funciona | Este adaptador só devolve HTTP; Mobile não resolve plugins pela rota TorBox |
 | Add-on HTTP | Servidor Node.js | Node 22+, Docker opcional, HTTPS | Sim: devolve torrents para a rota de resolução do próprio Nuvio |
 
 **NuvioTV:** use o add-on HTTP. O runtime JS revisado em `dev` possui fetch bloqueante e não disponibiliza timers assíncronos. As versões Play Store/App Store também podem não incluir plugins JS. Veja [a auditoria dos contratos](docs/NUVIO.md).
@@ -19,11 +19,27 @@ Não há fontes ou credenciais embutidas. Informe os manifestos já configurados
 4. Normaliza qualidade e idioma de áudio, preserva headers e legendas, remove duplicatas.
 5. Prioriza 4K → 1080p → 720p → 480p na fila de testes; testa fontes em paralelo.
 6. Baixa uma amostra de até 256 KiB por fonte. A velocidade estimada usa **bytes efetivamente recebidos / tempo de requisição e transferência**.
-7. Após o primeiro resultado aprovado, aguarda uma janela curta (650 ms por padrão) para permitir outras qualidades/idiomas. Retorna **um vencedor por qualidade encontrada**, em ordem decrescente. Se todas as qualidades forem preenchidas ou o trabalho acabar, retorna antes.
+7. Após o primeiro resultado aprovado, aguarda uma janela curta (650 ms por padrão) para permitir outras qualidades/idiomas. Retorna, por padrão, **uma fonte por qualidade e idioma**, em ordem decrescente de resolução. Se as fontes/testes terminarem, retorna antes. A quantidade e o agrupamento são configuráveis.
 
 O prazo total padrão é 6,5 segundos, incluindo TMDB. Uma fonte pendurada não prende a resposta. `settleMs: 0` favorece o primeiro resultado; uma janela maior permite mais alternativas. Não é possível devolver imediatamente o primeiro e, simultaneamente, garantir todas as qualidades de fontes ainda pendentes. O Nuvio espera uma única lista por execução, sem atualização incremental dentro do plugin.
 
-Entre fontes aprovadas de uma qualidade, prefere o idioma configurado e depois a maior velocidade observada. As velocidades mínimas padrão são 20 / 6 / 3 / 1 Mbps para 4K / 1080 / 720 / 480. São limites configuráveis, não uma garantia de reprodução: bitrate, codec, HDR, aparelho e oscilação de rede também influenciam.
+Dentro de cada qualidade, prefere o primeiro idioma configurado, depois o idioma original da obra informado pelo TMDB, e então as preferências extras. Exemplo: `languages: ["pt-BR","en"]` com anime originalmente japonês resulta em 4K pt-BR → 4K ja → 4K en → 1080p pt-BR → 1080p ja → 1080p en, quando essas fontes existem. Áudios não preferidos vêm depois; desconhecidos ficam por último. Uma URL com múltiplos áudios entra no grupo de maior preferência, sem duplicação.
+
+Dentro do mesmo grupo de idioma, fontes aprovadas precedem alternativas não verificadas e a maior velocidade prevalece. Usa a velocidade medida por amostra; se indisponível, aceita os campos numéricos `speedMbps` ou `downloadSpeedMbps` da fonte como informação **declarada**, sem convertê-la em aprovação. O campo genérico `speed` não é usado porque suas unidades são ambíguas. As velocidades mínimas padrão são 20 / 6 / 3 / 1 Mbps para 4K / 1080 / 720 / 480. São limites configuráveis, não uma garantia de reprodução: bitrate, codec, HDR, aparelho e oscilação de rede também influenciam.
+
+O Nuvio não injeta o idioma do aparelho no plugin: configure-o manualmente, com padrão `pt-BR`. O TMDB informa a língua original, normalmente sem região; o Kazuji não inventa `en-US` a partir de `en`. O app Mobile pode reordenar a lista alfabeticamente; a ordem devolvida pelo plugin não garante a ordem visual. Veja [a auditoria](docs/NUVIO.md).
+
+### Apresentação das fontes
+
+O rótulo nativo (`name`) contém três linhas; `title` repete o conteúdo para consumidores que o utilizam:
+
+```text
+Nome da obra (2024) · 4K · pt-BR
+Diretor/criador · Estúdio
+Classificação BR: 12 · 35.2 Mbps (amostra) · Nome da fonte
+```
+
+Título/ano, direção (filmes), criadores (séries), produtoras e certificações vêm do TMDB. Séries mostram o ano de estreia e a classificação da série. Campos ausentes aparecem como “não informado”; classificação de outro país não substitui silenciosamente a do país escolhido. No add-on HTTP, o nome do grupo identifica qualidade/idioma e `title` contém as três linhas. A disposição/truncamento final depende da versão do aplicativo.
 
 ### O que os testes de fonte cobrem
 
@@ -31,7 +47,7 @@ Entre fontes aprovadas de uma qualidade, prefere o idioma configurado e depois a
 - HLS: segue playlists, escolhe variante com a resolução anunciada e testa um segmento. Também detecta playlists em URLs sem extensão.
 - HLS criptografado/byte-range e DASH: não recebem aprovação de velocidade nesta implementação; só podem aparecer com a opção explícita de alternativas sem velocidade aprovada.
 - HEAD confirma somente resposta HTTP, sem medir throughput. Precisa da opção de alternativas para aparecer.
-- Torrents e `clientResolve`: são alternativas delegadas ao Nuvio no modo HTTP. **Não são testados antes da resolução** e não substituem um link direto já aprovado da mesma qualidade.
+- Torrents e `clientResolve`: são alternativas delegadas ao Nuvio no modo HTTP. **Não são testados antes da resolução** e ficam depois de links aprovados do mesmo grupo de qualidade/idioma. O limite configurado pode ocultá-los se esse grupo já tiver fontes melhores.
 
 O teste do plugin JS ocorre na conexão do aparelho. O teste do add-on HTTP ocorre **na conexão do servidor**, não na conexão do espectador. Um teste curto é uma estimativa daquele momento.
 
@@ -122,10 +138,15 @@ Os campos mais usados aparecem na interface. No plugin, use “Configuração av
 | Campo | Padrão | Descrição |
 | --- | --- | --- |
 | `manifests` | `[]` | Até 24 URLs HTTP(S). Array, JSON textual ou lista por linha/vírgula |
-| `qualities` | `[2160,1080,720,480]` | Uma opção por qualidade; `0` aceita resolução desconhecida |
-| `languages` | `["pt-BR","pt","en"]` | Idiomas em ordem de preferência |
-| `languageMode` | `prefer` | `prefer`, `strict` ou `any` |
+| `qualities` | `[2160,1080,720,480]` | Qualidades aceitas; `0` aceita resolução desconhecida |
+| `languages` | `["pt-BR"]` | Primeiro idioma = principal manual; idioma original entra em segundo, demais depois |
+| `resultMode` | `per_language` | `per_language`: grupos qualidade/idioma; `per_quality`: grupos por qualidade; `all`: todas as fontes válidas dentro dos orçamentos/prazos |
+| `resultsPerGroup` | `1` | De 1 a 20 fontes por grupo; ignorado em `all` |
+| `languageMode` | `prefer` | `prefer`; `strict` aceita preferências e idioma original; `any` desativa preferência de áudio |
 | `allowUnknownLanguage` | `true` | Em modo estrito, desative para rejeitar áudio sem identificação |
+| `allowedCodecs` | `[]` | Vazio aceita todos; `h264`, `hevc`, `av1` (aliases x264/x265 aceitos) |
+| `hdrMode` | `any` | `any`, `sdr` (rejeita HDR/Dolby Vision), `no_dolby_vision` |
+| `allowUnknownCompatibility` | `true` | Permite codec/HDR ausente quando o filtro correspondente está ativo |
 | `country` | `BR` | País ISO de duas letras para classificação |
 | `allowedRatings` | `[]` | Códigos exatos permitidos; vazio desativa filtro |
 | `unknownRating` | `block` | Bloquear ou permitir quando a classificação é desconhecida |
@@ -148,7 +169,9 @@ Os campos mais usados aparecem na interface. No plugin, use “Configuração av
 
 **Áudio:** normaliza campos informados pelas fontes e reconhece rótulos comuns, como PT-BR, Dublado e English. Essa informação pode ser incompleta ou errada. Não inspeciona todas as trilhas dentro do arquivo e não trata legenda/original_language como prova de áudio.
 
-**Idade:** aplica a classificação **do título**, consultada no TMDB para o país escolhido, antes de buscar streams. Exemplo BR: `allowedRatings: ["L","10","12"]`. Classificação ausente/falha de TMDB bloqueia por padrão; códigos conflitantes exigem que todos sejam permitidos. TV usa a classificação da série, não uma garantia específica de cada episódio. Não altera catálogos do Nuvio, não é controle parental do app e não impede uso de outros add-ons.
+**Idade:** aplica a classificação **do título**, consultada no TMDB para o país escolhido, antes de buscar streams. Exemplo BR: `allowedRatings: ["L","10","12"]`. Com esse filtro ativo, classificação ausente/falha de TMDB bloqueia por padrão; códigos conflitantes exigem que todos sejam permitidos. Com a lista vazia, o filtro fica desligado e classificação ausente é identificada no rótulo. TV usa a classificação da série, não uma garantia específica de cada episódio. Não altera catálogos do Nuvio, não é controle parental do app e não impede uso de outros add-ons.
+
+**Compatibilidade:** filtra campos `codec`/`videoCodec`, `hdr`/`dynamicRange` e rótulos de arquivo. `hdr: false` ou SDR explícito identifica SDR. Ausência de HDR no nome não prova SDR. Não consulta a capacidade real do aparelho nem analisa o vídeo inteiro; mantenha os filtros conforme seu dispositivo. `allowUnknownCompatibility: false` rejeita informações ausentes apenas para filtros ativos.
 
 ### Limites do runtime nativo
 

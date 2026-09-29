@@ -2,13 +2,18 @@
 <html lang="pt-BR">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kazuji Media · Configuração</title><link rel="stylesheet" href="/style.css"><script defer src="/configure.js"></script></head>
 <body><main>
-<h1>Kazuji Media</h1><p>Escolha as fontes e as preferências. O agregador retorna um resultado por qualidade disponível.</p>
+<h1>Kazuji Media</h1><p>Escolha as fontes, os idiomas e a quantidade de resultados por qualidade.</p>
 <form id="config">
-<label>URLs dos manifestos Stremio HTTP<textarea name="manifests" required rows="5" placeholder="https://seu-addon/manifest.json"></textarea><small>Uma URL por linha. Use URLs já configuradas no add-on original.</small></label>
+<label>URLs dos manifestos Stremio HTTP<textarea name="manifests" required rows="5" placeholder="https://seu-addon/manifest.json"></textarea><small>Separe por vírgula ou linha. Use URLs já configuradas no add-on original.</small></label>
 <label>Qualidades<input name="qualities" value="2160,1080,720,480"><small>2160 = 4K. 0 inclui qualidade desconhecida.</small></label>
-<label>Idiomas de áudio, por preferência<input name="languages" value="pt-BR,pt,en"></label>
-<label>Filtro de áudio<select name="languageMode"><option value="prefer">Preferir os idiomas escolhidos</option><option value="strict">Somente os idiomas escolhidos</option><option value="any">Qualquer idioma</option></select></label>
+<label>Idioma principal e preferências extras<input name="languages" value="pt-BR"><small>Informe manualmente o idioma do aparelho. Ordem: primeiro idioma, idioma original da obra (TMDB), depois os demais.</small></label>
+<label>Agrupamento<select name="resultMode"><option value="per_language">Por qualidade e idioma</option><option value="per_quality">Por qualidade</option><option value="all">Todas as fontes válidas</option></select></label>
+<label>Fontes por grupo<input name="resultsPerGroup" type="number" value="1" min="1" max="20"><small>Ignorado em Todas as fontes válidas. URLs com múltiplos áudios não se repetem.</small></label>
+<label>Filtro de áudio<select name="languageMode"><option value="prefer">Preferir os idiomas escolhidos</option><option value="strict">Somente preferências e idioma original</option><option value="any">Qualquer idioma, sem preferência</option></select></label>
 <label class="check"><input name="allowUnknownLanguage" type="checkbox" checked>Aceitar fontes que não informam idioma de áudio</label>
+<label>Codecs permitidos<input name="allowedCodecs" placeholder="h264,hevc,av1"><small>Vazio aceita todos. Configure conforme seu aparelho; as informações são declaradas pelas fontes.</small></label>
+<label>HDR<select name="hdrMode"><option value="any">Qualquer formato</option><option value="sdr">Somente SDR</option><option value="no_dolby_vision">Excluir Dolby Vision</option></select></label>
+<label class="check"><input name="allowUnknownCompatibility" type="checkbox" checked>Aceitar codec/HDR não informado quando houver filtro ativo</label>
 <label>Classificações indicativas permitidas<input name="allowedRatings" placeholder="L,10,12"><small>Vazio desativa o filtro. BR: L,10,12,14,16,18. A classificação pertence ao título inteiro.</small></label>
 <label>País da classificação<input name="country" value="BR" maxlength="2"></label>
 <label>Título sem classificação<select name="unknownRating"><option value="block">Bloquear</option><option value="allow">Permitir</option></select></label>

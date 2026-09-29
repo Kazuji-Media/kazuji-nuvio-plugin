@@ -22,7 +22,7 @@ function setup({streams={},delays={},errors={},meta={},output='native',key='test
     return response(new Uint8Array(262144),{'content-type':'video/mp4'},url);
   };
   const engine=createAggregator({request,output,tmdbApiKey:key});
-  const settings=Object.assign({manifests:['https://a.example/manifest.json'],qualities:[2160,1080,720,480],settleMs:60,totalTimeoutMs:500},config);
+  const settings=Object.assign({manifests:['https://a.example/manifest.json'],qualities:[2160,1080,720,480],resultMode:'per_quality',settleMs:60,totalTimeoutMs:500},config);
   return{calls,engine,run:(input={id:'123',type:'movie'})=>engine.aggregate(input,settings)};
 }
 function stream(q,url='https://video.example/'+q+'.mp4',extra={}){return Object.assign({url,title:'Example '+q+'p PT-BR'},extra);}
@@ -165,4 +165,111 @@ test('absolute deadline returns even if transport never completes',async()=>{
   const engine=createAggregator({request:()=>new Promise(()=>{}),tmdbApiKey:'x'});
   const start=Date.now();const result=await engine.aggregate({id:'1',type:'movie'},{manifests:['https://a.example/manifest.json'],totalTimeoutMs:500});
   assert.equal(result.streams.length,0);assert.ok(Date.now()-start<1000);
+});
+
+test('defaults to one source per quality/audio group and inserts original audio before extra preferences',async()=>{
+  const s=setup({meta:{original_language:'ja'},streams:{'a.example':[
+    stream(1080,'https://video.example/en',{title:'1080p English'}),
+    stream(2160,'https://video.example/ja4',{title:'4K Japanese'}),
+    stream(1080,'https://video.example/ja',{title:'1080p Japanese'}),
+    stream(2160,'https://video.example/pt4'),stream(1080,'https://video.example/pt'),
+  ]},config:{resultMode:undefined,languages:'pt-BR,en',settleMs:120}});
+  const result=await s.run();
+  assert.deepEqual(result.streams.map(x=>x.url.split('/').pop()),['pt4','ja4','pt','ja','en']);
+  assert.equal(normalizeConfig({}).resultMode,'per_language');
+  const query=new URL(s.calls.find(x=>x.url.includes('/movie/123')).url);
+  assert.equal(query.searchParams.get('language'),'pt-BR');assert.match(query.searchParams.get('append_to_response'),/credits/);
+});
+test('strict policy includes original audio but does not infer tracks from original language',async()=>{
+  const s=setup({meta:{original_language:'ja'},streams:{'a.example':[
+    stream(1080,'https://video.example/ja',{title:'1080p Japanese'}),
+    stream(1080,'https://video.example/en',{title:'1080p English'}),
+    stream(1080,'https://video.example/unknown',{title:'1080p',subtitles:[{language:'ja'}]}),
+  ]},config:{languageMode:'strict',allowUnknownLanguage:false,resultMode:'all'}});
+  assert.deepEqual((await s.run()).streams.map(x=>x.url),['https://video.example/ja']);
+});
+test('configures result quantity per group and all mode without duplicating multi-audio URLs',async()=>{
+  for(const [resultMode,resultsPerGroup,count] of [['per_language',1,2],['per_language',2,3],['per_quality',1,1],['per_quality',2,2],['all',1,3]]){
+    const s=setup({meta:{original_language:'ja'},streams:{'a.example':[
+      stream(1080,'https://video.example/multi',{title:'1080p',audioLanguages:['pt-BR','ja']}),
+      stream(1080,'https://video.example/pt'),
+      stream(1080,'https://video.example/ja',{title:'1080p Japanese'}),
+    ]},config:{resultMode,resultsPerGroup}});
+    const result=await s.run();assert.equal(result.streams.length,count);
+    assert.equal(new Set(result.streams.map(x=>x.url)).size,count);
+  }
+});
+test('reported Mbps breaks speed ties without approving a source or overriding measured throughput',async()=>{
+  const streams={'a.example':[stream(1080,'https://video.example/slow',{speedMbps:12}),stream(1080,'https://video.example/fast',{downloadSpeedMbps:50})]};
+  const fallback=setup({streams,config:{probeMode:'off',allowUnverified:true}});
+  assert.match((await fallback.run()).streams[0].url,/fast$/);
+  const notApproved=setup({streams,config:{probeMode:'off'}});assert.equal((await notApproved.run()).streams.length,0);
+  const measured=setup({streams,probe:async url=>{
+    await delay(url.endsWith('/fast')?35:5);return response(new Uint8Array(262144),{'content-type':'video/mp4'},url);
+  }});
+  assert.match((await measured.run()).streams[0].url,/slow$/);
+});
+test('ambiguous speed units are ignored and other audio never outranks preferred audio for speed',async()=>{
+  const s=setup({meta:{original_language:'ja'},streams:{'a.example':[
+    stream(1080,'https://video.example/ja',{title:'1080p Japanese',speedMbps:500}),
+    stream(1080,'https://video.example/pt',{speed:999999}),
+  ]},config:{resultMode:'all',probeMode:'off',allowUnverified:true}});
+  const result=await s.run();assert.match(result.streams[0].url,/pt$/);
+  assert.match(result.streams[0].name,/velocidade não verificada/);assert.match(result.streams[1].name,/fonte informa/);
+});
+test('formats native name in three lines with year, directors, studios and country certification',async()=>{
+  const s=setup({streams:{'a.example':[stream(1080)]},meta:{title:'A Obra',release_date:'2024-07-01',original_language:'en',credits:{crew:[{job:'Director',name:'Diretora'},{job:'Editor',name:'Montador'}]},production_companies:[{name:'Estúdio'}],release_dates:{results:[{iso_3166_1:'BR',release_dates:[{certification:'12'}]}]}}});
+  const row=(await s.run()).streams[0],lines=row.name.split('\n');
+  assert.equal(lines.length,3);assert.match(lines[0],/^A Obra \(2024\) · 1080p/);
+  assert.equal(lines[1],'Diretora · Estúdio');assert.match(lines[2],/^Classificação BR: 12/);
+  assert.equal(row.title,row.name);assert.doesNotMatch(row.name,/Montador/);
+});
+test('series label uses creator, first air year and series certification',async()=>{
+  const s=setup({streams:{'a.example':[stream(720)]},meta:{name:'Série',first_air_date:'2020-01-01',created_by:[{name:'Criador'}],production_companies:[{name:'Studio'}],content_ratings:{results:[{iso_3166_1:'BR',rating:'14'}]}}});
+  const row=(await s.run({id:'123',type:'tv',season:1,episode:3})).streams[0];
+  assert.match(row.name,/Série \(2020\)/);assert.match(row.name,/Criador · Studio\nClassificação BR: 14/);
+});
+test('missing metadata is explicit and never fabricates original language or age rating',async()=>{
+  const s=setup({key:'',streams:{'a.example':[stream(1080,'https://video.example/unknown',{title:'1080p'})]}});
+  const row=(await s.run({id:'tt123',type:'movie'})).streams[0];
+  assert.match(row.name,/Título não informado · tt123 \(ano não informado\)/);
+  assert.match(row.name,/Diretor\/criador não informado · Estúdio não informado/);
+  assert.match(row.name,/Classificação BR: não informada/);assert.equal(row.language,'Desconhecido');
+});
+test('filters codec and HDR before probing and handles unknown compatibility explicitly',async()=>{
+  const streams={'a.example':[
+    stream(1080,'https://video.example/h264',{title:'1080p PT-BR x264 SDR'}),
+    stream(1080,'https://video.example/hevc',{title:'1080p PT-BR HEVC HDR10'}),
+    stream(1080,'https://video.example/dv',{title:'1080p PT-BR HEVC Dolby Vision'}),
+    stream(1080,'https://video.example/unknown'),
+  ]};
+  for(const [config,expected] of [
+    [{allowedCodecs:'h264',allowUnknownCompatibility:false},['h264']],
+    [{hdrMode:'sdr',allowUnknownCompatibility:false},['h264']],
+    [{hdrMode:'no_dolby_vision',allowUnknownCompatibility:false},['h264','hevc']],
+    [{allowedCodecs:'h264',hdrMode:'sdr',allowUnknownCompatibility:true},['h264','unknown']],
+  ]){
+    const s=setup({streams,config:{...config,resultMode:'all'}}),result=await s.run();
+    assert.deepEqual(result.streams.map(x=>x.url.split('/').pop()).sort(),expected.sort());
+    assert.equal(result.stats.probes,expected.length);
+  }
+  assert.throws(()=>normalizeConfig({allowedCodecs:'mpeg2'}));
+  assert.deepEqual(normalizeConfig({allowedCodecs:'H.264,x265,av01'}).allowedCodecs,['h264','hevc','av1']);
+});
+test('keeps collecting original audio after all qualities have initial winners',async()=>{
+  const s=setup({meta:{original_language:'ja'},streams:{'a.example':[stream(1080)],'b.example':[stream(1080,'https://video.example/ja',{title:'1080p Japanese'})]},
+    delays:{'https://b.example/stream/movie/tt123.json':30},config:{resultMode:'per_language',qualities:[1080],manifests:'https://a.example/manifest.json,https://b.example/manifest.json',settleMs:90}});
+  assert.equal((await s.run()).streams.length,2);
+});
+
+test('uses declared speed to prioritize the probe budget within the same quality/audio group',async()=>{
+  const s=setup({streams:{'a.example':[stream(1080,'https://video.example/slow',{speedMbps:10}),stream(1080,'https://video.example/fast',{speedMbps:80})]},config:{maxProbes:1}});
+  const result=await s.run();assert.equal(result.stats.probes,1);assert.match(result.streams[0].url,/fast$/);
+});
+test('an English original is second to configured regional audio without inventing its region',async()=>{
+  const s=setup({meta:{original_language:'en'},streams:{'a.example':[
+    stream(1080,'https://video.example/ja',{title:'1080p Japanese'}),stream(1080,'https://video.example/en',{title:'1080p English'}),stream(1080,'https://video.example/pt'),
+  ]},config:{resultMode:'per_language',languages:'pt-BR,ja'}});
+  const result=await s.run();assert.deepEqual(result.streams.map(x=>x.language),['pt-BR','en','ja']);
+  assert.equal(normalizeConfig({languages:''}).languages[0],'pt-BR');
 });

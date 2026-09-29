@@ -5,7 +5,7 @@ form.addEventListener('submit',async event=>{
   const button=form.querySelector('button');button.disabled=true;status.textContent='Salvando configuração…';
   try{
     const data=Object.fromEntries(new FormData(form));
-    for(const key of ['allowUnknownLanguage','allowUnverified'])data[key]=form.elements[key].checked;
+    for(const key of ['allowUnknownLanguage','allowUnknownCompatibility','allowUnverified'])data[key]=form.elements[key].checked;
     if(data.advancedJson){const extra=JSON.parse(data.advancedJson);if(!extra||Array.isArray(extra)||typeof extra!=='object')throw new Error('JSON avançado inválido');Object.assign(data,extra);}
     delete data.advancedJson;
     const response=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});

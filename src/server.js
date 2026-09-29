@@ -7,7 +7,7 @@ const {createNodeTransport}=require('./node-transport');
 const {ConfigStore}=require('./config-store');
 const VERSION=require('../package.json').version;
 function manifest(config,id='default'){
-  return {id:'org.kazuji.media.'+id.slice(0,12),name:'Kazuji Media',version:VERSION,description:'Um resultado por qualidade. Testes por amostra e TorBox opcional via Nuvio.',
+  return {id:'org.kazuji.media.'+id.slice(0,12),name:'Kazuji Media',version:VERSION,description:'Fontes por qualidade e idioma, créditos e classificação. Testes por amostra e TorBox opcional via Nuvio.',
     resources:[{name:'stream',types:['movie','series'],idPrefixes:['tt','tmdb:']}],types:['movie','series'],catalogs:[],
     behaviorHints:{configurable:true,configurationRequired:!config.manifests.length}};
 }

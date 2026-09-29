@@ -3,8 +3,10 @@
 
 // Pure JavaScript: shared by Node and Nuvio QuickJS. No Node/browser imports.
 const DEFAULTS = {
-  manifests: [], qualities: [2160, 1080, 720, 480], languages: ['pt-BR', 'pt', 'en'],
+  manifests: [], qualities: [2160, 1080, 720, 480], languages: ['pt-BR'],
   languageMode: 'prefer', allowUnknownLanguage: true,
+  resultMode: 'per_language', resultsPerGroup: 1,
+  allowedCodecs: [], hdrMode: 'any', allowUnknownCompatibility: true,
   country: 'BR', allowedRatings: [], unknownRating: 'block',
   totalTimeoutMs: 6500, settleMs: 650, requestTimeoutMs: 2200, probeTimeoutMs: 1400,
   sourceConcurrency: 8, probeConcurrency: 4, maxCandidates: 48, maxProbes: 24,
@@ -73,7 +75,13 @@ function normalizeConfig(input) {
     return q;
   }))].sort((a,b) => b-a);
   if (!config.qualities.length) throw new Error('Selecione ao menos uma qualidade');
-  config.languages = list(input.languages == null ? DEFAULTS.languages : input.languages).map(language).filter(Boolean);
+  config.languages = list(input.languages == null || input.languages === '' ? DEFAULTS.languages : input.languages).map(language).filter(Boolean);
+  config.resultMode = enumValue(input.resultMode, ['per_language','per_quality','all'], 'per_language');
+  config.resultsPerGroup = number(input.resultsPerGroup, 1, 1, 20);
+  config.allowedCodecs = [...new Set(list(input.allowedCodecs).map(codec))];
+  if (config.allowedCodecs.some(x=>!x)) throw new Error('Codec inválido: use h264, hevc ou av1');
+  config.hdrMode = enumValue(input.hdrMode, ['any','sdr','no_dolby_vision'], 'any');
+  config.allowUnknownCompatibility = bool(input.allowUnknownCompatibility, true);
   config.allowedRatings = [...new Set(list(input.allowedRatings).map(x => String(x).trim().toUpperCase()))];
   config.country = String(input.country || 'BR').toUpperCase();
   if (!/^[A-Z]{2}$/.test(config.country)) throw new Error('País deve usar ISO de duas letras');
@@ -114,7 +122,31 @@ function audioLanguages(stream) {
     [/\b(italian|ita|it)\b/,'it'], [/\b(russian|rus|ru)\b/,'ru'],
   ]) if (regex.test(text)) result.push(code);
   // Subtitles and original_language are intentionally not evidence of audio tracks.
-  return [...new Set(result)];
+  return [...new Set(result)].filter(x=>x!=='pt' || !result.includes('pt-BR'));
+}
+function codec(raw) {
+  const s=String(raw||'').toLowerCase().replace(/[ ._-]/g,'');
+  return /^(h264|x264|avc|avc1)$/.test(s)?'h264':/^(h265|x265|hevc|hev1|hvc1)$/.test(s)?'hevc':/^(av1|av01)$/.test(s)?'av1':'';
+}
+function compatibility(stream) {
+  const text=[stream.codec,stream.videoCodec,stream.hdr,stream.dynamicRange,stream.name,stream.title,stream.description,stream.behaviorHints && stream.behaviorHints.filename].filter(Boolean).join(' ');
+  const videoCodec=codec(stream.videoCodec||stream.codec) || (/\b(h[ ._-]?264|x264|avc)\b/i.test(text)?'h264':/\b(h[ ._-]?265|x265|hevc)\b/i.test(text)?'hevc':/\bav1\b/i.test(text)?'av1':'');
+  const range=/\b(dolby[ ._-]?vision|dovi|dv)\b/i.test(text)?'dv':/\b(hdr(?:10\+?)?|hlg)\b/i.test(text)?'hdr':stream.hdr===false || /\bsdr\b/i.test(text)?'sdr':'';
+  return {codec:videoCodec,range};
+}
+function compatibilityAllowed(info,config) {
+  if (config.allowedCodecs.length && (info.codec ? !config.allowedCodecs.includes(info.codec) : !config.allowUnknownCompatibility)) return false;
+  if (config.hdrMode!=='any') {
+    if (!info.range) return config.allowUnknownCompatibility;
+    if (config.hdrMode==='sdr' && info.range!=='sdr' || config.hdrMode==='no_dolby_vision' && info.range==='dv') return false;
+  }
+  return true;
+}
+function reportedSpeed(stream) {
+  // Only fields with explicit Mbps units; arbitrary "speed" values are ambiguous.
+  const value=stream.speedMbps ?? stream.downloadSpeedMbps;
+  const n=typeof value==='number'?value:NaN;
+  return Number.isFinite(n) && n>0 && n<=10000?n:0;
 }
 function quality(stream) {
   if (stream.quality != null) {
@@ -196,17 +228,43 @@ function candidate(stream,source,config,output) {
   const q = quality(stream);
   if (!config.qualities.includes(q)) return null;
   const langs = audioLanguages(stream), rank = languageRank(langs,config);
+  const media=compatibility(stream);
+  if (!compatibilityAllowed(media,config)) return null;
   if ((!langs.length && !config.allowUnknownLanguage) || (config.languageMode === 'strict' && rank===1000 && (langs.length || !config.allowUnknownLanguage))) return null;
   const hash = String(stream.infoHash || '').trim();
   const torrent = /^(?:[a-fA-F0-9]{40}|[A-Za-z2-7]{32})$/.test(hash) || /^magnet:|^torrent:\/\//i.test(stream.url || '');
   const direct = httpUrl(stream.url);
-  // Native Nuvio plugin torrents cannot use the app's TorBox resolver.
+  // This native implementation returns tested HTTP media only. Mobile's TorBox
+  // resolver excludes plugins; TV has a separate resolver/runtime contract.
   const deferred = !direct && (torrent || stream.clientResolve);
   if (deferred && (output !== 'stremio' || config.torrentMode !== 'native')) return null;
   if (!direct && !deferred) return null;
   const headers = safeHeaders(Object.assign({},stream.behaviorHints && stream.behaviorHints.proxyHeaders && stream.behaviorHints.proxyHeaders.request,stream.headers));
   const key = direct ? stream.url+'|'+JSON.stringify(Object.keys(headers).sort().map(k=>[k,headers[k]])) : hash+'|'+(stream.fileIdx ?? '')+'|'+(stream.url || '')+'|'+JSON.stringify(stream.clientResolve || {});
-  return {raw:stream,source,q,langs,rank,headers,key,deferred,health:null};
+  const groupLanguage=langs.slice().sort((a,b)=>languageRank([a],config)-languageRank([b],config)||a.localeCompare(b))[0]||'und';
+  return {raw:stream,source,q,langs,rank:langs.length?rank:1001,groupLanguage,media,reportedMbps:reportedSpeed(stream),headers,key,deferred,health:null};
+}
+
+function metadata(meta,ctx,config) {
+  const clean=value=>String(value||'').replace(/[\r\n]+/g,' ').trim();
+  const date=String(meta.release_date||meta.first_air_date||'');
+  const directors=ctx.type==='series'?(meta.created_by||[]):(meta.credits && meta.credits.crew||[]).filter(x=>x.job==='Director');
+  return {title:clean(meta.title||meta.name||meta.original_title||meta.original_name)||'Título não informado · '+ctx.base,
+    year:/^\d{4}-/.test(date)?date.slice(0,4):'',
+    creators:[...new Set(directors.map(x=>clean(x.name)).filter(Boolean))].join(', '),
+    studios:[...new Set((meta.production_companies||[]).map(x=>clean(x.name)).filter(Boolean))].join(', '),
+    ratings:ratingValues(meta,ctx,config.country),country:config.country,originalLanguage:language(meta.original_language)};
+}
+function selectResults(candidates,config) {
+  const sorted=candidates.slice().sort((a,b)=>b.q-a.q || compare(a,b) || a.key.localeCompare(b.key));
+  if(config.resultMode==='all')return sorted;
+  const counts=new Map();
+  return sorted.filter(c=>{
+    const group=c.q+(config.resultMode==='per_language'?'|'+c.groupLanguage:'');
+    const count=counts.get(group)||0;
+    if(count>=config.resultsPerGroup)return false;
+    counts.set(group,count+1);return true;
+  });
 }
 
 function createAggregator(options) {
@@ -217,6 +275,7 @@ function createAggregator(options) {
   async function aggregate(rawInput,rawConfig) {
     const config = normalizeConfig(rawConfig);
     const ctx = parseInput(rawInput.id,rawInput.type,rawInput.season,rawInput.episode);
+    ctx.meta=metadata({},ctx,config);
     const output = options.output || 'native';
     const started = now(), deadline = started + config.totalTimeoutMs;
     const controller = new AbortController();
@@ -232,9 +291,9 @@ function createAggregator(options) {
         closed = true; clearTimeout(firstTimer); clearTimeout(totalTimer);
         if (parentSignal) parentSignal.removeEventListener('abort',finish);
         controller.abort(); queue.length = 0;
-        for (const [q,c] of fallback) if (!winners.has(q) && (config.allowUnverified || c.deferred)) winners.set(q,c);
+        for (const [key,c] of fallback) if (config.allowUnverified || c.deferred) winners.set(key,c);
         stats.elapsedMs = now()-started;
-        resolve({streams:[...winners.values()].sort((a,b)=>b.q-a.q).map(c=>format(c,output)),stats:Object.assign({},stats)});
+        resolve({streams:selectResults([...winners.values()],config).map(c=>format(c,output,ctx.meta)),stats:Object.assign({},stats)});
       };
       totalTimer = setTimeout(finish,config.totalTimeoutMs);
     });
@@ -263,27 +322,25 @@ function createAggregator(options) {
     function accept(c,health) {
       if (closed) return;
       c.health = health;
-      const previous = winners.get(c.q);
-      if (!previous || compare(c,previous)<0) winners.set(c.q,c);
+      winners.set(c.key,c);
       if (!firstTimer) firstTimer = setTimeout(finish,config.settleMs);
-      if (config.qualities.every(q=>winners.has(q))) finish();
     }
     function exhausted() { if (!pendingSources && !runningProbes && !queue.length) finish(); }
     function pump() {
-      queue.sort((a,b)=>b.q-a.q || a.rank-b.rank);
+      queue.sort((a,b)=>b.q-a.q || compare(a,b));
       while (!closed && queue.length && runningProbes<config.probeConcurrency) {
         if (stats.probes >= config.maxProbes) { queue.length=0; break; }
         const c = queue.shift();
         runningProbes++; stats.probes++;
         probe(c,config,request,now).then(h=>{
           if (h.verified) accept(c,h);
-          else if (!closed) { c.health=h; const old=fallback.get(c.q); if (!old || compare(c,old)<0) fallback.set(c.q,c); }
+          else if (!closed) { c.health=h; fallback.set(c.key,c); }
         }).catch(()=>{ stats.failures++; }).finally(()=>{runningProbes--;pump();exhausted();});
       }
       exhausted();
     }
     function ingest(streams,source) {
-      const candidates = streams.map(s=>candidate(s,source,config,output)).filter(Boolean).sort((a,b)=>b.q-a.q || a.rank-b.rank);
+      const candidates = streams.map(s=>candidate(s,source,config,output)).filter(Boolean).sort((a,b)=>b.q-a.q || compare(a,b));
       for (const c of candidates) {
         if (closed || stats.candidates>=config.maxCandidates) break;
         if (seen.has(c.key)) continue;
@@ -291,7 +348,7 @@ function createAggregator(options) {
         if (c.deferred) {
           // Native debrid delegation is an untested alternative, never a speed-tested winner.
           c.health={verified:false,method:'Nuvio/TorBox',deferred:true};
-          const old=fallback.get(c.q); if (!old || compare(c,old)<0) fallback.set(c.q,c);
+          fallback.set(c.key,c);
           if (!firstTimer) firstTimer=setTimeout(finish,config.settleMs);
         } else queue.push(c);
       }
@@ -301,7 +358,7 @@ function createAggregator(options) {
       const key = config.tmdbApiKey || options.tmdbApiKey || '';
       let meta = {};
       if (key) {
-        const suffix='?api_key='+encodeURIComponent(key);
+          const suffix='?api_key='+encodeURIComponent(key)+'&language='+encodeURIComponent(config.languages[0]||'pt-BR');
         if (!ctx.tmdbId) {
           const found=await json('https://api.themoviedb.org/3/find/'+ctx.imdbId+suffix+'&external_source=imdb_id',3600000);
           const row=((ctx.type==='movie' ? found.movie_results : found.tv_results) || [])[0];
@@ -309,12 +366,16 @@ function createAggregator(options) {
         }
         if (ctx.tmdbId) {
           const type=ctx.type==='series'?'tv':'movie';
-          const append=type==='movie'?'external_ids,release_dates':'external_ids,content_ratings';
+          const append=type==='movie'?'external_ids,release_dates,credits':'external_ids,content_ratings';
           meta=await json('https://api.themoviedb.org/3/'+type+'/'+ctx.tmdbId+suffix+'&append_to_response='+append,3600000);
           ctx.imdbId=ctx.imdbId || meta.imdb_id || meta.external_ids && meta.external_ids.imdb_id;
         }
       }
-      if (!ratingAllowed(ratingValues(meta,ctx,config.country),config)) {stats.ageBlocked=true;return false;}
+      ctx.meta=metadata(meta,ctx,config);
+      // Primary configured language, then original language, then extra preferences.
+      // The original language changes ranking only; it never proves a stream's audio.
+      config.languages=[...new Set([config.languages[0],ctx.meta.originalLanguage,...config.languages.slice(1)].filter(Boolean))];
+      if (!ratingAllowed(ctx.meta.ratings,config)) {stats.ageBlocked=true;return false;}
       return true;
     }
     async function sourceJob(manifestUrl) {
@@ -328,7 +389,7 @@ function createAggregator(options) {
         if (!id || !supports(manifest,ctx.type,id)) return;
         const response=await json(resourceUrl(manifestUrl,ctx.type,id),0);
         stats.sources++;
-        if (Array.isArray(response.streams)) ingest(response.streams.slice(0,300),String(manifest.name || manifest.id || 'Add-on').slice(0,100));
+        if (Array.isArray(response.streams)) ingest(response.streams.slice(0,300),String(manifest.name || manifest.id || 'Add-on').replace(/[\r\n]+/g,' ').slice(0,100));
       } catch (_) {stats.failures++;}
       finally {pendingSources--;exhausted();}
     }
@@ -365,9 +426,10 @@ function createAggregator(options) {
   return {aggregate};
 }
 function compare(a,b) {
-  return a.rank-b.rank || Number(b.health && b.health.verified)-Number(a.health && a.health.verified) ||
-    (b.health && b.health.mbps || 0)-(a.health && a.health.mbps || 0);
+  return a.rank-b.rank || a.groupLanguage.localeCompare(b.groupLanguage) || Number(b.health && b.health.verified)-Number(a.health && a.health.verified) ||
+    speed(b)-speed(a);
 }
+function speed(c) {return c.health && c.health.mbps>0?c.health.mbps:c.reportedMbps;}
 async function probe(c,config,request,now,initialPlaylist,startedAt) {
   if (config.probeMode==='off') return {verified:false,method:'desativado'};
   const start=startedAt == null ? now() : startedAt;
@@ -432,12 +494,14 @@ async function probe(c,config,request,now,initialPlaylist,startedAt) {
   const verified=mbps>=config.minMbps[c.q];
   return {verified,method:'amostra',mbps,bytes,latencyMs:now()-start,slow:!verified,mediaType:hls?'hls':'direct'};
 }
-function format(c,output) {
+function format(c,output,meta) {
   const health=c.health || {verified:false};
   const q=c.q===2160?'4K':c.q ? c.q+'p':'Qualidade desconhecida';
-  const tag=health.verified ? health.mbps.toFixed(1)+' Mbps (amostra)' : health.deferred ? 'resolver no Nuvio · sem teste de velocidade' : health.slow ? 'abaixo da velocidade mínima' : 'velocidade não verificada';
-  const label='Kazuji '+q+' · '+c.source;
-  const title=[c.raw.title || c.raw.description || c.raw.name || q,tag,c.langs.join(', ')].filter(Boolean).join('\n');
+  const tag=health.verified ? health.mbps.toFixed(1)+' Mbps (amostra)' : health.deferred ? 'resolver no Nuvio · sem teste de velocidade' : health.slow ? 'abaixo da velocidade mínima' : c.reportedMbps?c.reportedMbps.toFixed(1)+' Mbps (fonte informa; não verificado)':'velocidade não verificada';
+  const title=[meta.title+' ('+(meta.year||'ano não informado')+') · '+q+' · '+(c.langs.join(', ')||'áudio não informado'),
+    (meta.creators||'Diretor/criador não informado')+' · '+(meta.studios||'Estúdio não informado'),
+    'Classificação '+meta.country+': '+(meta.ratings.join(', ')||'não informada')+' · '+tag+' · '+c.source].join('\n');
+  const label=output==='native'?title:'Kazuji '+q+' · '+c.groupLanguage;
   if (output==='stremio') {
     const result=Object.assign({},c.raw,{name:label,title,description:title});
     result.behaviorHints=Object.assign({},c.raw.behaviorHints);
@@ -516,19 +580,24 @@ function onSettings() {
     {type:'header',label:'Kazuji · Agregador'},
     text('manifests','Manifestos Stremio HTTP','https://addon.exemplo/manifest.json','Separe URLs por vírgula, ou use um array JSON. Inclua a configuração do próprio add-on na URL. Não aceita repositórios de plugins JavaScript.'),
     text('qualities','Qualidades','2160,1080,720,480','Ordem decrescente. 2160 = 4K; 0 inclui qualidade desconhecida. Padrão: 2160,1080,720,480.'),
-    text('languages','Preferência de áudio','pt-BR,pt,en','Padrão: pt-BR,pt,en. Usa metadados/rótulos das fontes; legendas não comprovam idioma do áudio.'),
-    select('languageMode','Filtro de idioma',[['Preferir','prefer'],['Somente idiomas selecionados','strict'],['Qualquer idioma','any']],'prefer'),
+    text('languages','Idioma principal e preferências extras','pt-BR','Configure o idioma do aparelho manualmente (padrão pt-BR). A ordem será: primeiro idioma, idioma original da obra no TMDB, depois os demais. Legendas não comprovam áudio.'),
+    select('resultMode','Agrupamento dos resultados',[['Por qualidade e idioma','per_language'],['Por qualidade','per_quality'],['Todas as fontes válidas','all']],'per_language'),
+    text('resultsPerGroup','Fontes por grupo','1','De 1 a 20; padrão 1. Ignorado em Todas as fontes válidas. Áudio múltiplo entra no grupo de maior preferência, sem duplicar a URL.'),
+    select('languageMode','Filtro de idioma',[['Preferir','prefer'],['Somente preferências e idioma original','strict'],['Qualquer idioma, sem preferência','any']],'prefer'),
     {type:'toggle',key:'allowUnknownLanguage',label:'Aceitar áudio sem idioma informado',defaultValue:true},
+    text('allowedCodecs','Codecs permitidos','h264,hevc,av1','Vazio aceita todos. Configure conforme seu aparelho. Usa apenas informações declaradas pela fonte; não detecta capacidades do dispositivo.'),
+    select('hdrMode','Compatibilidade HDR',[['Qualquer formato','any'],['Somente SDR','sdr'],['Excluir Dolby Vision','no_dolby_vision']],'any'),
+    {type:'toggle',key:'allowUnknownCompatibility',label:'Aceitar codec/HDR não informado',defaultValue:true,description:'Aplica-se quando um filtro de codec/HDR está ativo.'},
     text('allowedRatings','Classificações permitidas','L,10,12','Vazio desativa o filtro. Use os códigos do país escolhido. Padrão BR: L,10,12,14,16,18. Bloqueia todo o título quando não permitido.'),
     text('country','País da classificação','BR','Código ISO: BR, US, GB, etc. Padrão BR.'),
-    select('unknownRating','Título sem classificação',[['Bloquear','block'],['Permitir','allow']],'block'),
+    select('unknownRating','Título sem classificação',[['Bloquear','block'],['Permitir','allow']],'block','Aplicado quando há classificações permitidas configuradas.'),
     select('probeMode','Teste da fonte',[['Amostra de vídeo','sample'],['Apenas disponibilidade HTTP','head'],['Desativado','off']],'sample','Só a amostra mede velocidade. HLS: testa uma variante e um segmento.'),
     {type:'toggle',key:'allowUnverified',label:'Aceitar alternativas sem velocidade aprovada',defaultValue:false,description:'Pode devolver fontes lentas ou não verificadas. Identificação no nome/descrição.'},
     text('totalTimeoutMs','Prazo total (ms)','6500','De 500 a 20000 ms; inclui consulta TMDB, fontes e testes.'),
     text('settleMs','Janela após primeiro aprovado (ms)','650','0 para devolver imediatamente; maior dá chance a outros idiomas/qualidades.'),
     text('probeTimeoutMs','Prazo por amostra (ms)','1400','De 100 a 5000 ms.'),
     text('advancedJson','Configuração avançada JSON','{"probeConcurrency":4,"minMbps":{"2160":20,"1080":6}}','Permite ajustar todos os campos descritos no README. Não coloque chaves em presets publicados.'),
-    {type:'info',label:'TorBox conectado ao Nuvio exige a instalação do add-on HTTP Kazuji. O plugin JS recebe apenas URLs de vídeo e não acessa a conta TorBox. Usa automaticamente TMDB_API_KEY do app.'},
+    {type:'info',label:'Este plugin Kazuji retorna links HTTP de vídeo. No Mobile, TorBox do app resolve torrents de add-ons HTTP. TV tem contratos diferentes e requer a versão HTTP deste agregador. O plugin não acessa credenciais TorBox. Usa TMDB_API_KEY do app para título, créditos, idioma original e classificação.'},
   ];
 }
 module.exports={getStreams,onSettings};

@@ -19,7 +19,7 @@ As builds distribuídas podem diferir dessas branches. Não é uma declaração 
 | `globalThis.SCRAPER_ID` | Identificador do scraper |
 | `globalThis.TMDB_API_KEY` | Chave efetiva de TMDB fornecida pelo app |
 
-O app **não passa** título, classificação, idioma preferido global, catálogo completo, histórico, progresso de reprodução, conta/sessão TorBox ou callbacks de resultados incrementais para essa chamada. Kazuji consulta TMDB para IDs/classificações e mantém preferências próprias.
+O app **não passa** título, classificação, idioma do celular/preferido global, catálogo completo, histórico, progresso de reprodução, conta/sessão TorBox ou callbacks de resultados incrementais para essa chamada. Kazuji consulta TMDB para IDs, título, ano, diretor/criadores, produtoras, língua original e classificação; o idioma principal é uma configuração manual.
 
 Fontes:
 
@@ -57,13 +57,22 @@ O renderer revisado lê `isPassword`, mas não o aplica como transformação de 
 
 Por isso o adaptador JS retorna somente URLs diretas com os campos que o Nuvio preserva.
 
+### Rótulo e ordenação na tela
+
+No Mobile, a conversão usa `name` (ou `title` se `name` estiver ausente) como rótulo e monta a descrição com quality/size/language. Assim, colocar créditos apenas em `title` quando `name` existe pode ocultá-los. Kazuji coloca as três linhas no `name` nativo. O `Text` do rótulo em StreamCard não impõe `maxLines` nessa revisão, mas não houve verificação visual no aparelho.
+
+`StreamFetchSupport.sortedForGroupedDisplay` ordena por sourceName, streamLabel e streamSubtitle. Essa ordenação alfabética pode sobrescrever a prioridade devolvida pelo plugin. Kazuji ordena seus resultados por resolução e áudio antes de retornar, sem inserir caracteres invisíveis no rótulo; não promete forçar a ordem visual do app. Para garantí-la preservando título/ano no começo, o Nuvio precisaria respeitar a ordem da fonte ou receber um campo explícito de prioridade.
+
+- [Conversão e ordenação — StreamFetchSupport.kt](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamFetchSupport.kt)
+- [Renderização — StreamCard.kt](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamCard.kt)
+
 ## TorBox conectado ao app
 
 O registro de APIs do plugin JS inclui fetch, URL, crypto, DOM, WASM e funções básicas; **não inclui uma API de TorBox nem de credenciais debrid**.
 
-Além disso, `DirectDebridPlaybackResolver.shouldResolveToPlayableStream` exige `stream.isInstalledAddonStream`, e essa propriedade testa se o grupo começa com `addon:`. Grupos de plugin começam com `plugin:` ou `plugin-repo:`.
+No **Mobile**, `DirectDebridPlaybackResolver.shouldResolveToPlayableStream` exige `stream.isInstalledAddonStream`, e essa propriedade testa se o grupo começa com `addon:`. Grupos de plugin começam com `plugin:` ou `plugin-repo:`.
 
-A implementação correta sem pedir outra chave TorBox é instalar Kazuji como **add-on HTTP**. O app recebe os campos completos do recurso stream, reconhece o grupo addon, verifica cache e resolve usando o resolvedor ativo.
+Para este Kazuji e para TorBox nativo no Mobile, instale a versão **add-on HTTP**. O app recebe os campos completos do recurso stream, reconhece o grupo addon, verifica cache e resolve usando o resolvedor ativo.
 
 - [Guardas e resolução TorBox — DirectDebridResolver.kt](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/debrid/DirectDebridResolver.kt#L112-L129)
 - [Resolução local e credencial ativa](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/debrid/DirectDebridResolver.kt#L201-L295)
@@ -71,6 +80,12 @@ A implementação correta sem pedir outra chave TorBox é instalar Kazuji como *
 - [Verificação de cache TorBox](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/debrid/LocalDebridService.kt)
 
 Kazuji não consegue medir a velocidade de um torrent ainda não resolvido pela conta do app. Essas alternativas são marcadas como sem teste. Não existe handshake para detectar a conta ativa no servidor Kazuji.
+
+No **TV**, a guarda de `DirectDebridResolver` usa a necessidade de resolução local e a credencial ativa, sem a exclusão por origem `addon:` do Mobile. Pelo código revisado, um plugin pode entregar uma URL torrent/magnet com infoHash e ser elegível para resolução TorBox. Isso não torna este agregador JS compatível com o runtime bloqueante do TV; o Kazuji nativo atual só retorna HTTP e precisa de timers assíncronos.
+
+O motor P2P do app também é separado da rota TorBox e reconhece hashes/URLs torrent conforme build e configuração; não deve ser confundido com suporte à conta TorBox. Nesta implementação Kazuji, torrents são preservados apenas no adaptador HTTP. Não há bridge para o plugin iniciar um torrent e medir sua velocidade antes de devolvê-lo.
+
+- [Guarda de debrid TV](https://github.com/NuvioMedia/NuvioTV/blob/fa6614384e23ff5808bf39c53dd3fa602055c54e/app/src/main/java/com/nuvio/tv/core/debrid/DirectDebridResolver.kt)
 
 ## Rede, prazos e NuvioTV
 
@@ -98,12 +113,14 @@ Consequência: Kazuji JS requer o runtime assíncrono do Mobile Full; use a vers
 | --- | --- | --- |
 | Legendas embutidas nas respostas | Implementada | Preserva URL/idioma/headers |
 | Headers de reprodução | Implementada | Referer, User-Agent e outros headers de fonte |
-| TMDB do app | Implementada no JS | IDs externos e classificações; servidor usa chave própria |
+| TMDB do app | Implementada no JS | IDs, título/ano, créditos, língua original e classificação; servidor usa chave própria |
 | `fileIdx` e trackers | Preservados no HTTP | Ajuda a selecionar arquivo/episódio |
 | `bingeGroup` | Preservado no HTTP | Pode auxiliar continuidade de série conforme suporte do cliente |
 | `filename`, `videoHash`, `videoSize` | Preservados no HTTP | Podem auxiliar identificação para legendas |
 | `clientResolve` | Preservado no HTTP | Delega formatos suportados pelo Nuvio; servidor não autentica debrid |
-| Codec/HDR/Dolby Vision/tamanho máximo | Ampliação possível | Filtrar rótulos dos streams; não são prova do codec real |
+| Codec/HDR/Dolby Vision | Implementada | Filtros configuráveis por informações declaradas; não comprovam codec real/capacidade do aparelho |
+| Quantidade por qualidade/idioma | Implementada | Uma ou várias por grupo; ou todas as válidas dentro dos prazos/orçamentos |
+| Tamanho máximo de arquivo | Ampliação possível | Não implementado |
 | API independente de legendas | Ampliação possível | Consultar recurso `subtitles` dos add-ons; não implementado |
 | Catálogos agregados | Ampliação possível | Novo recurso `catalog` com colisões/IDs; não implementado |
 | Resultados incrementais por qualidade | Exige mudança do contrato ou múltiplos scrapers | Um getStreams devolve uma única lista |
