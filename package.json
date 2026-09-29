@@ -1,0 +1,13 @@
+{
+  "name": "kazuji-media",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agregador de streams para Nuvio e Stremio",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "node --test test/*.test.js",
+    "check": "node scripts/build.js --check",
+    "start": "node src/server.js"
+  }
+}

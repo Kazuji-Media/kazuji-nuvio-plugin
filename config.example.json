@@ -1,0 +1,22 @@
+{
+  "manifests": [],
+  "qualities": [2160, 1080, 720, 480],
+  "languages": ["pt-BR", "pt", "en"],
+  "languageMode": "prefer",
+  "allowUnknownLanguage": true,
+  "country": "BR",
+  "allowedRatings": [],
+  "unknownRating": "block",
+  "totalTimeoutMs": 6500,
+  "settleMs": 650,
+  "requestTimeoutMs": 2200,
+  "probeTimeoutMs": 1400,
+  "sourceConcurrency": 8,
+  "probeConcurrency": 4,
+  "maxProbes": 24,
+  "sampleBytes": 262144,
+  "minMbps": {"2160": 20, "1080": 6, "720": 3, "480": 1},
+  "probeMode": "sample",
+  "allowUnverified": false,
+  "torrentMode": "off"
+}

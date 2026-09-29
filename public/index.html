@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kazuji Media · Configuração</title><link rel="stylesheet" href="/style.css"><script defer src="/configure.js"></script></head>
+<body><main>
+<h1>Kazuji Media</h1><p>Escolha as fontes e as preferências. O agregador retorna um resultado por qualidade disponível.</p>
+<form id="config">
+<label>URLs dos manifestos Stremio HTTP<textarea name="manifests" required rows="5" placeholder="https://seu-addon/manifest.json"></textarea><small>Uma URL por linha. Use URLs já configuradas no add-on original.</small></label>
+<label>Qualidades<input name="qualities" value="2160,1080,720,480"><small>2160 = 4K. 0 inclui qualidade desconhecida.</small></label>
+<label>Idiomas de áudio, por preferência<input name="languages" value="pt-BR,pt,en"></label>
+<label>Filtro de áudio<select name="languageMode"><option value="prefer">Preferir os idiomas escolhidos</option><option value="strict">Somente os idiomas escolhidos</option><option value="any">Qualquer idioma</option></select></label>
+<label class="check"><input name="allowUnknownLanguage" type="checkbox" checked>Aceitar fontes que não informam idioma de áudio</label>
+<label>Classificações indicativas permitidas<input name="allowedRatings" placeholder="L,10,12"><small>Vazio desativa o filtro. BR: L,10,12,14,16,18. A classificação pertence ao título inteiro.</small></label>
+<label>País da classificação<input name="country" value="BR" maxlength="2"></label>
+<label>Título sem classificação<select name="unknownRating"><option value="block">Bloquear</option><option value="allow">Permitir</option></select></label>
+<label>Teste da fonte<select name="probeMode"><option value="sample">Amostra de vídeo</option><option value="head">Só disponibilidade HTTP (sem medir velocidade)</option><option value="off">Desativado</option></select></label>
+<label class="check"><input name="allowUnverified" type="checkbox">Aceitar alternativas sem velocidade aprovada</label>
+<label>TorBox / debrid do Nuvio<select name="torrentMode"><option value="off">Desativado: só links diretos</option><option value="native">Devolver torrents para o Nuvio resolver</option></select><small>Conecte o TorBox nas configurações do Nuvio e escolha-o como resolvedor. Torrents não são testados por amostra antes da resolução. Kazuji não recebe a conta do app.</small></label>
+<div class="grid"><label>Prazo total (ms)<input name="totalTimeoutMs" type="number" value="6500" min="500" max="20000"></label><label>Janela após primeiro resultado (ms)<input name="settleMs" type="number" value="650" min="0" max="3000"></label></div>
+<label>Configuração avançada JSON<textarea name="advancedJson" rows="3" placeholder='{"probeConcurrency":4,"minMbps":{"2160":20,"1080":6}}'></textarea></label>
+<p class="notice">A preferência de áudio usa informações fornecidas pelas fontes. A classificação usa TMDB e precisa da chave configurada no servidor. Um teste curto estima a conexão naquele momento.</p>
+<button type="submit">Gerar link de instalação</button><p id="status" role="status"></p>
+</form>
+<section id="result" hidden><h2>Instalar no Nuvio</h2><p>Copie o endereço abaixo e adicione como <strong>add-on HTTP</strong> no Nuvio.</p><input id="manifest" readonly aria-label="URL do manifesto"><button id="copy" type="button">Copiar</button><p>Guarde esse link como uma senha: ele dá acesso à sua configuração. As URLs das fontes ficam armazenadas no servidor e não aparecem no manifesto.</p><a id="install">Abrir no Stremio</a></section>
+</main></body></html>

@@ -1,0 +1,13 @@
+services:
+  kazuji:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:7000:7000"
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:-https://kazuji.example.com}
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+    volumes:
+      - kazuji-data:/app/data
+volumes:
+  kazuji-data:
