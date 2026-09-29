@@ -5,7 +5,14 @@
 <h1>Kazuji Media</h1><p>Escolha as fontes, os idiomas e a quantidade de resultados por qualidade.</p>
 <form id="config">
 <label>URLs dos manifestos Stremio HTTP<textarea name="manifests" required rows="5" placeholder="https://seu-addon/manifest.json"></textarea><small>Separe por vírgula ou linha. Use URLs já configuradas no add-on original.</small></label>
-<label>Qualidades<input name="qualities" value="2160,1080,720,480"><small>2160 = 4K. 0 inclui qualidade desconhecida.</small></label>
+<fieldset><legend>Qualidades de vídeo</legend><small>Selecione uma ou mais. Os resultados priorizam a maior resolução.</small>
+<div class="quality-options">
+<label class="check"><input name="qualities" type="checkbox" value="2160" checked>4K</label>
+<label class="check"><input name="qualities" type="checkbox" value="1080" checked>1080p</label>
+<label class="check"><input name="qualities" type="checkbox" value="720" checked>720p</label>
+<label class="check"><input name="qualities" type="checkbox" value="480" checked>480p</label>
+<label class="check"><input name="qualities" type="checkbox" value="0">Qualidade desconhecida</label>
+</div></fieldset>
 <label>Idioma principal e preferências extras<input name="languages" value="pt-BR"><small>Informe manualmente o idioma do aparelho. Ordem: primeiro idioma, idioma original da obra (TMDB), depois os demais.</small></label>
 <label>Agrupamento<select name="resultMode"><option value="per_language">Por qualidade e idioma</option><option value="per_quality">Por qualidade</option><option value="all">Todas as fontes válidas</option></select></label>
 <label>Fontes por grupo<input name="resultsPerGroup" type="number" value="1" min="1" max="20"><small>Ignorado em Todas as fontes válidas. URLs com múltiplos áudios não se repetem.</small></label>

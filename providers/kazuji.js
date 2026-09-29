@@ -517,6 +517,12 @@ module.exports={DEFAULTS,normalizeConfig,createAggregator,quality,audioLanguages
 'use strict';
 // Appended to aggregator.js by scripts/build.js; no external require at runtime.
 const KazujiCore = module.exports;
+const QUALITY_OPTIONS = [[2160,'4K'],[1080,'1080p'],[720,'720p'],[480,'480p'],[0,'Qualidade desconhecida']];
+
+function baseQualities(settings) {
+  // Preserve legacy text/preset selections when new toggles have not been saved.
+  return KazujiCore.normalizeConfig({qualities:settings.qualities}).qualities;
+}
 
 function nativeTransport(maxConcurrent) {
   let active=0;
@@ -561,6 +567,13 @@ async function getStreams(tmdbId,mediaType,season,episode) {
     return [];
   }
   const settings=Object.assign({},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{});
+  if(QUALITY_OPTIONS.some(([q])=>settings['quality'+q]!=null)){
+    const previous=baseQualities(settings);
+    settings.qualities=QUALITY_OPTIONS.filter(([q])=>{
+      const value=settings['quality'+q];
+      return value==null?previous.includes(q):value===true || value==='true';
+    }).map(([q])=>q);
+  }
   if(settings.advancedJson){
     const extra=JSON.parse(settings.advancedJson);
     if(!extra || typeof extra!=='object' || Array.isArray(extra))throw new Error('Configuração avançada inválida');
@@ -576,10 +589,12 @@ async function getStreams(tmdbId,mediaType,season,episode) {
 function onSettings() {
   function select(key,label,values,defaultValue,description){return{type:'select',key,label,description,defaultValue,options:values.map(x=>({label:x[0],value:x[1]}))};}
   function text(key,label,placeholder,description){return{type:'text',key,label,placeholder,description};}
+  const selected=baseQualities(Object.assign({},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{}));
   return [
     {type:'header',label:'Kazuji · Agregador'},
     text('manifests','Manifestos Stremio HTTP','https://addon.exemplo/manifest.json','Separe URLs por vírgula, ou use um array JSON. Inclua a configuração do próprio add-on na URL. Não aceita repositórios de plugins JavaScript.'),
-    text('qualities','Qualidades','2160,1080,720,480','Ordem decrescente. 2160 = 4K; 0 inclui qualidade desconhecida. Padrão: 2160,1080,720,480.'),
+    {type:'header',label:'Qualidades de vídeo · selecione uma ou mais'},
+    ...QUALITY_OPTIONS.map(([q,label])=>({type:'toggle',key:'quality'+q,label,defaultValue:selected.includes(q)})),
     text('languages','Idioma principal e preferências extras','pt-BR','Configure o idioma do aparelho manualmente (padrão pt-BR). A ordem será: primeiro idioma, idioma original da obra no TMDB, depois os demais. Legendas não comprovam áudio.'),
     select('resultMode','Agrupamento dos resultados',[['Por qualidade e idioma','per_language'],['Por qualidade','per_quality'],['Todas as fontes válidas','all']],'per_language'),
     text('resultsPerGroup','Fontes por grupo','1','De 1 a 20; padrão 1. Ignorado em Todas as fontes válidas. Áudio múltiplo entra no grupo de maior preferência, sem duplicar a URL.'),
@@ -596,7 +611,7 @@ function onSettings() {
     text('totalTimeoutMs','Prazo total (ms)','6500','De 500 a 20000 ms; inclui consulta TMDB, fontes e testes.'),
     text('settleMs','Janela após primeiro aprovado (ms)','650','0 para devolver imediatamente; maior dá chance a outros idiomas/qualidades.'),
     text('probeTimeoutMs','Prazo por amostra (ms)','1400','De 100 a 5000 ms.'),
-    text('advancedJson','Configuração avançada JSON','{"probeConcurrency":4,"minMbps":{"2160":20,"1080":6}}','Permite ajustar todos os campos descritos no README. Não coloque chaves em presets publicados.'),
+    text('advancedJson','Configuração avançada JSON','{"probeConcurrency":4,"minMbps":{"2160":20,"1080":6}}','Permite ajustar todos os campos descritos no README. Se definir qualities aqui, prevalece sobre os botões. Não coloque chaves em presets publicados.'),
     {type:'info',label:'Este plugin Kazuji retorna links HTTP de vídeo. No Mobile, TorBox do app resolve torrents de add-ons HTTP. TV tem contratos diferentes e requer a versão HTTP deste agregador. O plugin não acessa credenciais TorBox. Usa TMDB_API_KEY do app para título, créditos, idioma original e classificação.'},
   ];
 }

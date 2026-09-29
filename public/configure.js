@@ -4,9 +4,11 @@ form.addEventListener('submit',async event=>{
   event.preventDefault();
   const button=form.querySelector('button');button.disabled=true;status.textContent='Salvando configuração…';
   try{
-    const data=Object.fromEntries(new FormData(form));
+    const fields=new FormData(form),data=Object.fromEntries(fields);
+    data.qualities=fields.getAll('qualities').map(Number);
     for(const key of ['allowUnknownLanguage','allowUnknownCompatibility','allowUnverified'])data[key]=form.elements[key].checked;
     if(data.advancedJson){const extra=JSON.parse(data.advancedJson);if(!extra||Array.isArray(extra)||typeof extra!=='object')throw new Error('JSON avançado inválido');Object.assign(data,extra);}
+    if(Array.isArray(data.qualities)&&!data.qualities.length)throw new Error('Selecione ao menos uma qualidade');
     delete data.advancedJson;
     const response=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     const body=await response.json();if(!response.ok)throw new Error(body.error||'Erro ao salvar');

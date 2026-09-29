@@ -32,6 +32,8 @@ Fontes:
 
 O manifesto de repositório usa `scrapers`, com `hasSettings: true`. O módulo exporta `onSettings()`; o app chama essa função e renderiza campos `header`, `info`, `text`, `select` e `toggle`. Valores são persistidos e injetados como `SCRAPER_SETTINGS`.
 
+Não há campo `multiselect` nesse renderer. A seleção múltipla de qualidades do Kazuji usa cinco campos `toggle` independentes, convertidos pelo adaptador em uma lista de resoluções. Fontes continuam sendo cadastradas dinamicamente pelo campo de manifestos. A página web usa checkboxes para as mesmas qualidades.
+
 - [Modelo do manifesto](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/plugins/PluginModels.kt#L16-L45)
 - [Renderização/persistência das configurações](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/fullCommonMain/kotlin/com/nuvio/app/features/plugins/PluginSettingsDialog.kt)
 

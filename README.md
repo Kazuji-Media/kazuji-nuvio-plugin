@@ -57,6 +57,8 @@ O teste do plugin JS ocorre na conexão do aparelho. O teste do add-on HTTP ocor
 2. Em plugins/repositórios do Nuvio Mobile Full, adicione a URL do `manifest.json`.
 3. Abra as configurações do Kazuji e informe os manifestos das fontes, idiomas, classificações e prazos.
 
+As qualidades são selecionadas individualmente: **4K, 1080p, 720p, 480p e qualidade desconhecida**. No Mobile, cada opção é um botão liga/desliga; na página web, uma caixa de seleção. Ative uma ou mais. Por padrão, as quatro resoluções conhecidas estão ativas e a desconhecida está desativada. As configurações antigas do campo textual `qualities` continuam funcionando.
+
 Com GitHub Pages habilitado em **Settings → Pages → Deploy from a branch → main / root**, o endereço esperado é:
 
 ```text
@@ -164,6 +166,8 @@ Os campos mais usados aparecem na interface. No plugin, use “Configuração av
 | `allowUnverified` | `false` | Permite alternativas não aprovadas; nunca recupera fontes HTTP inválidas |
 | `torrentMode` | `off` | `native` delega torrents/debrid ao Nuvio, exclusivamente pelo add-on HTTP |
 | `tmdbApiKey` | vazio | Sobrescreve chave TMDB; normalmente use chave do app ou variável do servidor |
+
+No formulário nativo, os botões são salvos como `quality2160`, `quality1080`, `quality720`, `quality480` e `quality0`. O adaptador converte os valores em `qualities`; opções ainda não salvas herdam a seleção antiga/preset. O campo avançado JSON é aplicado por último: se declarar `qualities`, ele prevalece sobre os botões. A API HTTP continua recebendo o array `qualities`.
 
 ### Idioma e idade
 

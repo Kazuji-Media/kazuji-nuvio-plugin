@@ -29,3 +29,38 @@ test('runs generated bundle without Node imports using the native fetch response
   const streams=await plugin.getStreams('123','movie');assert.equal(streams.length,1);assert.equal(streams[0].quality,'1080p');
   assert.ok(calls.some(x=>x.options.headers.Range==='bytes=0-262143'));
 });
+
+function qualityPlugin(settings){
+  const fetch=async url=>{
+    const data=url.includes('themoviedb')?{imdb_id:'tt123'}:url.endsWith('manifest.json')?
+      {name:'Source',id:'source',types:['movie'],resources:['stream'],idPrefixes:['tt']}:
+      {streams:[2160,1080,720,480,0].map(q=>({quality:q,title:'PT-BR',url:'https://media.example/'+q+'.mp4'}))};
+    return{status:200,url,headers:{get:()=>null},arrayBuffer:async()=>new Uint8Array(0).buffer,text:async()=>JSON.stringify(data)};
+  };
+  return sandbox({manifests:'https://source.example/manifest.json',probeMode:'off',allowUnverified:true,...settings},fetch);
+}
+test('quality switches preserve multiple selections, unknown quality and legacy partial settings',async()=>{
+  for(const [settings,expected] of [
+    [{quality2160:true,quality1080:true,quality720:false,quality480:false,quality0:false},['4K','1080p']],
+    [{qualities:'720'},['720p']],
+    [{qualities:'720',quality1080:true},['1080p','720p']],
+    [{quality2160:false,quality1080:false,quality720:false,quality480:false,quality0:true},['Qualidade desconhecida']],
+    [{quality2160:false,quality1080:false,quality720:'true',quality480:false},['720p']],
+  ]){
+    const rows=await qualityPlugin(settings).getStreams('123','movie');
+    assert.deepEqual(Array.from(rows,row=>row.quality),expected);
+  }
+});
+test('rejects an empty quality selection and lets explicit advanced qualities override switches',async()=>{
+  const disabled={quality2160:false,quality1080:false,quality720:false,quality480:false,quality0:false};
+  await assert.rejects(qualityPlugin(disabled).getStreams('123','movie'),/Selecione ao menos uma qualidade/);
+  const rows=await qualityPlugin({...disabled,advancedJson:'{"qualities":[480]}'}).getStreams('123','movie');
+  assert.deepEqual(Array.from(rows,row=>row.quality),['480p']);
+});
+test('native quality defaults reflect existing text selections when migrating',()=>{
+  const fields=qualityPlugin({qualities:'1080,720'}).onSettings();
+  assert.equal(fields.some(x=>x.key==='qualities'),false);
+  const toggles=fields.filter(x=>/^quality\d+$/.test(x.key||''));
+  assert.equal(toggles.length,5);
+  assert.deepEqual(Array.from(toggles.filter(x=>x.defaultValue),x=>x.key),['quality1080','quality720']);
+});
