@@ -59,8 +59,12 @@ test('end-to-end configured addon works with two local upstreams and no TorBox a
   assert.equal(result.streams[0].behaviorHints.videoSize,999999);
   const badges=await(await fetch(host+'/badges.json')).json();
   assert.ok(badges.filters.length>=40);
+  const reference=require('../badges.base.json');
+  for(const original of reference.filters)assert.equal(badges.filters.find(f=>f.id===original.id).imageURL,original.imageURL);
   for(const badge of badges.filters){
-    const asset=new URL(badge.imageURL);assert.equal(asset.origin,'https://kazuji.example');
+    const asset=new URL(badge.imageURL);
+    if(asset.origin==='https://raw.githubusercontent.com')continue;
+    assert.equal(asset.origin,'https://kazuji.example');
     const icon=await fetch(host+asset.pathname);assert.equal(icon.status,200);assert.match(icon.headers.get('content-type'),/image\/svg\+xml/);
     assert.match(await icon.text(),/<svg/);
   }

@@ -43,7 +43,11 @@ async function createServer(options={}) {
       if(req.method==='GET'&&url.pathname==='/health'){send(200,{status:'ok',version:VERSION});return;}
       if(req.method==='GET'&&url.pathname==='/badges.json'){
         const badges=JSON.parse(await fs.readFile(path.join(__dirname,'../badges.json'),'utf8'));
-        if(publicUrl)for(const filter of badges.filters)filter.imageURL=new URL('/assets/fusion/'+filter.id+'.svg',publicUrl).href;
+        if(publicUrl)for(const filter of badges.filters){
+          // Preserve original third-party PNG URLs from the reference pack.
+          const prefix='https://joaovpimenta.github.io/kazuji-media/';
+          if(filter.imageURL.startsWith(prefix))filter.imageURL=new URL('/'+filter.imageURL.slice(prefix.length),publicUrl).href;
+        }
         send(200,badges);return;
       }
       if(req.method==='GET'&&/^\/assets\/(?:logo\.svg|fusion\/[a-z0-9-]+\.svg)$/.test(url.pathname)){

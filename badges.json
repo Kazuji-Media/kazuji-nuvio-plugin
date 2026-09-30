@@ -1,37 +1,265 @@
 {
   "filters": [
     {
-      "id": "4k",
-      "groupId": "resolution",
+      "borderColor": "#FF5E6470",
+      "groupId": "gr",
+      "id": "r-4k",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_4k.png",
+      "isEnabled": true,
       "name": "4K",
-      "pattern": "(?i)\\b(?:2160p?|4k|uhd)\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/4k.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF96BFFF"
+      "text": "sss",
+      "pattern": "(?is)^(?=.*(?:2160[pi]?|4k|uhd))(?!.*(?:1080[pi]?|720[pi]?))",
+      "tagColor": "#14FFFFFF",
+      "tagStyle": "filled",
+      "textColor": "#F5F7FA",
+      "type": "filter"
     },
     {
-      "id": "1080p",
-      "groupId": "resolution",
+      "borderColor": "#FF5E6470",
+      "groupId": "gr",
+      "id": "r-1080",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_1080p.png",
+      "isEnabled": true,
       "name": "1080p",
-      "pattern": "(?i)\\b1080p?\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/1080p.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF96BFFF"
+      "pattern": "(?is)\\b1080[pi]?\\b",
+      "tagColor": "#10FFFFFF",
+      "tagStyle": "filled",
+      "textColor": "#E8ECF2",
+      "type": "filter"
     },
     {
-      "id": "720p",
-      "groupId": "resolution",
-      "name": "720p",
-      "pattern": "(?i)\\b720p?\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/720p.svg",
+      "borderColor": "#FF4B5563",
+      "groupId": "gr",
+      "id": "r-720",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_720p.png",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF96BFFF"
+      "name": "720p",
+      "pattern": "(?is)\\b720[pi]?\\b",
+      "tagColor": "#0CFFFFFF",
+      "tagStyle": "filled",
+      "textColor": "#D8DEE8",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF4A7DFF",
+      "groupId": "gq",
+      "id": "q-r",
+      "imageURL": "https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/images/mono-remux.png",
+      "isEnabled": true,
+      "name": "Remux",
+      "pattern": "(?is)\\b(?:remux|bdremux)\\b",
+      "tagColor": "#144A7DFF",
+      "tagStyle": "filled",
+      "textColor": "#F8FAFC",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF4A7DFF",
+      "groupId": "gq",
+      "id": "q-b",
+      "imageURL": "https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/images/mono-bluray.png",
+      "isEnabled": true,
+      "name": "BluRay",
+      "pattern": "(?is)^(?=.*(?:bluray|blu-ray))(?!.*remux)",
+      "tagColor": "#144A7DFF",
+      "tagStyle": "filled",
+      "textColor": "#EEF4FF",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FFB8862B",
+      "groupId": "edition-imax",
+      "id": "v-imax",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_imax.png",
+      "isEnabled": true,
+      "name": "IMAX",
+      "pattern": "(?is)^(?=.*\\bIMAX\\b)",
+      "tagColor": "#16B8862B",
+      "tagStyle": "filled",
+      "textColor": "#FFF1D8",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF7C4DFF",
+      "groupId": "visual-vision",
+      "id": "a-dv",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_DV.png",
+      "isEnabled": true,
+      "name": "DV",
+      "pattern": "(?is)\\b(?:dv|uhdrdv|fhdrdv|dovi|dolby[\\s._-]?vision)\\b",
+      "tagColor": "#1A7C4DFF",
+      "tagStyle": "filled",
+      "textColor": "#F1EBFF",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FFB87333",
+      "groupId": "gv",
+      "id": "v-hdr10p",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_HDR10Plus.png",
+      "isEnabled": true,
+      "name": "HDR10+",
+      "pattern": "(?is)^(?=.*hdr[\\s._-]?10(?:\\+|[\\s._-]?plus|p\\b)).*$",
+      "tagColor": "#18B87333",
+      "tagStyle": "filled",
+      "textColor": "#FFF1E5",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF6B7280",
+      "groupId": "gv",
+      "id": "v-hdr10",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_HDR10.png",
+      "isEnabled": true,
+      "name": "HDR10",
+      "pattern": "(?is)^(?=.*hdr[\\s._-]?10)(?!.*hdr[\\s._-]?10(?:\\+|[\\s._-]?plus|p\\b)).*$",
+      "tagColor": "#126B7280",
+      "tagStyle": "filled",
+      "textColor": "#ECEFF4",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF5A6472",
+      "groupId": "gv",
+      "id": "v-hdr",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_HDR.png",
+      "isEnabled": true,
+      "name": "HDR",
+      "pattern": "(?is)^(?!.*\\b(?:dv|dovi|dolby[\\s._-]?vision)\\b)(?=.*\\bHDR\\b)(?!.*hdr[\\s._-]?10)",
+      "tagColor": "#105A6472",
+      "tagStyle": "filled",
+      "textColor": "#E3E8EF",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF2D7FF9",
+      "groupId": "audio-immersive",
+      "id": "a-at",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_Atmos.png",
+      "isEnabled": true,
+      "name": "Atmos",
+      "pattern": "(?is)\\batmos\\b",
+      "tagColor": "#1A2D7FF9",
+      "tagStyle": "filled",
+      "textColor": "#EEF5FF",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF4D90FF",
+      "groupId": "ga",
+      "id": "a-th",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_TrueHD.png",
+      "isEnabled": true,
+      "name": "TrueHD",
+      "pattern": "(?is)^(?=.*\\btrue[\\s._-]?hd\\b)",
+      "tagColor": "#144D90FF",
+      "tagStyle": "filled",
+      "textColor": "#F3F7FF",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF5E83C2",
+      "groupId": "ga",
+      "id": "a-dp",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_DDPLUS.png",
+      "isEnabled": true,
+      "name": "DD+",
+      "pattern": "(?is)^(?=.*(?:\\bddp|\\bdd\\+|\\beac-?3|\\be-?ac-?3))(?!.*\\btrue[\\s._-]?hd\\b)",
+      "tagColor": "#125E83C2",
+      "tagStyle": "filled",
+      "textColor": "#EAF1FF",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF6B7280",
+      "groupId": "ga",
+      "id": "a-dd",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_DD.png",
+      "isEnabled": true,
+      "name": "DD",
+      "pattern": "(?is)^(?=.*\\b(?:dd[\\s._-]?5[. -]?1|dd[25][. ][01]|dd(?![pA-Za-z+])\\b|\\bac-?3|\\bdolby[\\s.-]?digital\\b|\\bdolbyd\\b))(?!.*\\b(?:ddp|dd\\+|eac-?3|e-?ac-?3)\\b)(?!.*\\btrue[\\s._-]?hd\\b).*$",
+      "tagColor": "#106B7280",
+      "tagStyle": "filled",
+      "textColor": "#DCE3EA",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF00A3A3",
+      "groupId": "ga",
+      "id": "a-dtsx",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_dtsx.png",
+      "isEnabled": true,
+      "name": "DTS:X",
+      "pattern": "(?is)\\bdts[-_.: ]?x\\b",
+      "tagColor": "#1800A3A3",
+      "tagStyle": "filled",
+      "textColor": "#EDFFFF",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF1BA6A6",
+      "groupId": "ga",
+      "id": "a-dtsma",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_dtsHDMA.png",
+      "isEnabled": true,
+      "name": "DTS-HD MA",
+      "pattern": "(?is)^(?=.*\\bdts[-_. ]?(?:hd[-_. ]?)?(?:ma|master)\\b)(?!.*\\bdts[-_.: ]?x\\b)",
+      "tagColor": "#141BA6A6",
+      "tagStyle": "filled",
+      "textColor": "#F2FFFF",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF2D8F96",
+      "groupId": "ga",
+      "id": "a-dtshd",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_dtsHD.png",
+      "isEnabled": true,
+      "name": "DTS-HD",
+      "pattern": "(?is)^(?=.*\\bdts[-_. ]?hd\\b)(?!.*\\bdts[-_. ]?(?:hd[-_. ]?)?(?:ma|master)\\b)(?!.*\\bdts[-_.: ]?x\\b)",
+      "tagColor": "#122D8F96",
+      "tagStyle": "filled",
+      "textColor": "#EAFBFC",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF4F7C82",
+      "groupId": "ga",
+      "id": "a-dts",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_dts.png",
+      "isEnabled": true,
+      "name": "DTS",
+      "pattern": "(?is)^(?=.*\\bDTS\\b)(?!.*\\bdts[-_. ]?(?:hd|ma|xll|x)\\b)",
+      "tagColor": "#104F7C82",
+      "tagStyle": "filled",
+      "textColor": "#E5F2F3",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF4B5563",
+      "groupId": "gc",
+      "id": "ch-71",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_71.png",
+      "isEnabled": true,
+      "name": "7.1",
+      "pattern": "(?i)(?:^|[^0-9])7[. ]1(?![0-9])",
+      "tagColor": "#0F4B5563",
+      "tagStyle": "filled",
+      "textColor": "#C9D1DC",
+      "type": "filter"
+    },
+    {
+      "borderColor": "#FF4B5563",
+      "groupId": "gc",
+      "id": "ch-51",
+      "imageURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_51.png",
+      "isEnabled": true,
+      "name": "5.1",
+      "pattern": "(?i)(?:^|[^0-9])5[. ]1(?![0-9])",
+      "tagColor": "#0F4B5563",
+      "tagStyle": "filled",
+      "textColor": "#C9D1DC",
+      "type": "filter"
     },
     {
       "id": "480p",
@@ -40,31 +268,11 @@
       "pattern": "(?i)\\b480p?\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/480p.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF96BFFF"
-    },
-    {
-      "id": "remux",
-      "groupId": "source",
-      "name": "REMUX",
-      "pattern": "(?i)\\bremux\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/remux.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF99DAB3"
-    },
-    {
-      "id": "bluray",
-      "groupId": "source",
-      "name": "BluRay",
-      "pattern": "(?i)\\bblu[ ._-]?ray\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/bluray.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF99DAB3"
+      "tagStyle": "filled",
+      "tagColor": "#14FFFFFF",
+      "textColor": "#F5F7FA",
+      "borderColor": "#FF5E6470",
+      "type": "filter"
     },
     {
       "id": "web-dl",
@@ -73,9 +281,11 @@
       "pattern": "(?i)\\bweb[ ._-]?dl\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/web-dl.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF99DAB3"
+      "tagStyle": "filled",
+      "tagColor": "#144A7DFF",
+      "textColor": "#EEF4FF",
+      "borderColor": "#FF4A7DFF",
+      "type": "filter"
     },
     {
       "id": "webrip",
@@ -84,9 +294,11 @@
       "pattern": "(?i)\\bwebrip\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/webrip.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF99DAB3"
+      "tagStyle": "filled",
+      "tagColor": "#144A7DFF",
+      "textColor": "#EEF4FF",
+      "borderColor": "#FF4A7DFF",
+      "type": "filter"
     },
     {
       "id": "hdcam",
@@ -95,9 +307,11 @@
       "pattern": "(?i)\\bhdcam\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hdcam.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF99DAB3"
+      "tagStyle": "filled",
+      "tagColor": "#144A7DFF",
+      "textColor": "#EEF4FF",
+      "borderColor": "#FF4A7DFF",
+      "type": "filter"
     },
     {
       "id": "dvdrip",
@@ -106,9 +320,11 @@
       "pattern": "(?i)\\bdvdrip\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dvdrip.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF99DAB3"
+      "tagStyle": "filled",
+      "tagColor": "#144A7DFF",
+      "textColor": "#EEF4FF",
+      "borderColor": "#FF4A7DFF",
+      "type": "filter"
     },
     {
       "id": "hevc",
@@ -117,9 +333,11 @@
       "pattern": "(?i)\\b(?:hevc|h[ ._-]?265|x265)\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hevc.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFB6B0FC"
+      "tagStyle": "filled",
+      "tagColor": "#14FFFFFF",
+      "textColor": "#F5F7FA",
+      "borderColor": "#FF5E6470",
+      "type": "filter"
     },
     {
       "id": "avc",
@@ -128,9 +346,11 @@
       "pattern": "(?i)\\b(?:avc|h[ ._-]?264|x264)\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/avc.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFB6B0FC"
+      "tagStyle": "filled",
+      "tagColor": "#14FFFFFF",
+      "textColor": "#F5F7FA",
+      "borderColor": "#FF5E6470",
+      "type": "filter"
     },
     {
       "id": "av1",
@@ -139,9 +359,11 @@
       "pattern": "(?i)\\bav1\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/av1.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFB6B0FC"
+      "tagStyle": "filled",
+      "tagColor": "#14FFFFFF",
+      "textColor": "#F5F7FA",
+      "borderColor": "#FF5E6470",
+      "type": "filter"
     },
     {
       "id": "vp9",
@@ -150,42 +372,11 @@
       "pattern": "(?i)\\bvp9\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/vp9.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFB6B0FC"
-    },
-    {
-      "id": "dolby-vision",
-      "groupId": "vision",
-      "name": "Dolby Vision",
-      "pattern": "(?i)\\b(?:dolby[ ._-]?vision|dovi)\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dolby-vision.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF5D58D"
-    },
-    {
-      "id": "hdr10-plus",
-      "groupId": "hdr",
-      "name": "HDR10+",
-      "pattern": "(?i)\\bhdr10(?:\\+|plus)",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hdr10-plus.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF5D58D"
-    },
-    {
-      "id": "hdr10",
-      "groupId": "hdr",
-      "name": "HDR10",
-      "pattern": "(?i)\\bhdr10\\b(?!\\+)",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hdr10.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF5D58D"
+      "tagStyle": "filled",
+      "tagColor": "#14FFFFFF",
+      "textColor": "#F5F7FA",
+      "borderColor": "#FF5E6470",
+      "type": "filter"
     },
     {
       "id": "hlg",
@@ -194,20 +385,11 @@
       "pattern": "(?i)\\bhlg\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hlg.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF5D58D"
-    },
-    {
-      "id": "hdr",
-      "groupId": "hdr",
-      "name": "HDR",
-      "pattern": "(?i)\\bhdr\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hdr.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF5D58D"
+      "tagStyle": "filled",
+      "tagColor": "#105A6472",
+      "textColor": "#E3E8EF",
+      "borderColor": "#FF5A6472",
+      "type": "filter"
     },
     {
       "id": "sdr",
@@ -216,86 +398,11 @@
       "pattern": "(?i)\\bsdr\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/sdr.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF5D58D"
-    },
-    {
-      "id": "atmos",
-      "groupId": "immersive",
-      "name": "Atmos",
-      "pattern": "(?i)\\batmos\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/atmos.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
-    },
-    {
-      "id": "dts-x",
-      "groupId": "audio",
-      "name": "DTS:X",
-      "pattern": "(?i)\\bdts[ .:_-]?x\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dts-x.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
-    },
-    {
-      "id": "truehd",
-      "groupId": "audio",
-      "name": "TrueHD",
-      "pattern": "(?i)\\btrue[ ._-]?hd\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/truehd.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
-    },
-    {
-      "id": "dts-hd-ma",
-      "groupId": "audio",
-      "name": "DTS-HD MA",
-      "pattern": "(?i)\\bdts[ ._-]?hd[ ._-]?ma\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dts-hd-ma.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
-    },
-    {
-      "id": "dd-plus",
-      "groupId": "audio",
-      "name": "DD+",
-      "pattern": "(?i)\\b(?:dd\\+|ddp|eac3)",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dd-plus.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
-    },
-    {
-      "id": "dolby-digital",
-      "groupId": "audio",
-      "name": "Dolby Digital",
-      "pattern": "(?i)\\bdolby[ ._-]?digital\\b(?![ ._-]?plus)",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dolby-digital.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
-    },
-    {
-      "id": "dts",
-      "groupId": "audio",
-      "name": "DTS",
-      "pattern": "(?i)\\bdts\\b(?![ .:_-]?(?:x|hd))",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dts.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
+      "tagStyle": "filled",
+      "tagColor": "#105A6472",
+      "textColor": "#E3E8EF",
+      "borderColor": "#FF5A6472",
+      "type": "filter"
     },
     {
       "id": "aac",
@@ -304,9 +411,11 @@
       "pattern": "(?i)\\baac\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/aac.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
+      "tagStyle": "filled",
+      "tagColor": "#104F7C82",
+      "textColor": "#E5F2F3",
+      "borderColor": "#FF4F7C82",
+      "type": "filter"
     },
     {
       "id": "flac",
@@ -315,9 +424,11 @@
       "pattern": "(?i)\\bflac\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/flac.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
+      "tagStyle": "filled",
+      "tagColor": "#104F7C82",
+      "textColor": "#E5F2F3",
+      "borderColor": "#FF4F7C82",
+      "type": "filter"
     },
     {
       "id": "pcm",
@@ -326,9 +437,11 @@
       "pattern": "(?i)\\bpcm\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/pcm.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
+      "tagStyle": "filled",
+      "tagColor": "#104F7C82",
+      "textColor": "#E5F2F3",
+      "borderColor": "#FF4F7C82",
+      "type": "filter"
     },
     {
       "id": "mp3",
@@ -337,20 +450,11 @@
       "pattern": "(?i)\\bmp3\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/mp3.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
-    },
-    {
-      "id": "7-1",
-      "groupId": "channels",
-      "name": "7.1",
-      "pattern": "(?i)\\b7\\.1\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/7-1.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFBBD0D8"
+      "tagStyle": "filled",
+      "tagColor": "#104F7C82",
+      "textColor": "#E5F2F3",
+      "borderColor": "#FF4F7C82",
+      "type": "filter"
     },
     {
       "id": "6-1",
@@ -359,20 +463,11 @@
       "pattern": "(?i)\\b6\\.1\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/6-1.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFBBD0D8"
-    },
-    {
-      "id": "5-1",
-      "groupId": "channels",
-      "name": "5.1",
-      "pattern": "(?i)\\b5\\.1\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/5-1.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFBBD0D8"
+      "tagStyle": "filled",
+      "tagColor": "#0F4B5563",
+      "textColor": "#C9D1DC",
+      "borderColor": "#FF4B5563",
+      "type": "filter"
     },
     {
       "id": "2-0",
@@ -381,9 +476,11 @@
       "pattern": "(?i)\\b2\\.0\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/2-0.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFBBD0D8"
+      "tagStyle": "filled",
+      "tagColor": "#0F4B5563",
+      "textColor": "#C9D1DC",
+      "borderColor": "#FF4B5563",
+      "type": "filter"
     },
     {
       "id": "1-0",
@@ -392,20 +489,11 @@
       "pattern": "(?i)\\b1\\.0\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/1-0.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFBBD0D8"
-    },
-    {
-      "id": "imax",
-      "groupId": "imax",
-      "name": "IMAX",
-      "pattern": "(?i)\\bimax\\b",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/imax.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFCFBBA3"
+      "tagStyle": "filled",
+      "tagColor": "#0F4B5563",
+      "textColor": "#C9D1DC",
+      "borderColor": "#FF4B5563",
+      "type": "filter"
     },
     {
       "id": "extended",
@@ -414,9 +502,11 @@
       "pattern": "(?i)\\bextended\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/extended.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFCFBBA3"
+      "tagStyle": "filled",
+      "tagColor": "#16B8862B",
+      "textColor": "#FFF1D8",
+      "borderColor": "#FFB8862B",
+      "type": "filter"
     },
     {
       "id": "director-s-cut",
@@ -425,9 +515,11 @@
       "pattern": "(?i)\\bdirector'?s[ ._-]?cut\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/director-s-cut.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFCFBBA3"
+      "tagStyle": "filled",
+      "tagColor": "#16B8862B",
+      "textColor": "#FFF1D8",
+      "borderColor": "#FFB8862B",
+      "type": "filter"
     },
     {
       "id": "proper",
@@ -436,9 +528,11 @@
       "pattern": "(?i)\\bproper\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/proper.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFCFBBA3"
+      "tagStyle": "filled",
+      "tagColor": "#16B8862B",
+      "textColor": "#FFF1D8",
+      "borderColor": "#FFB8862B",
+      "type": "filter"
     },
     {
       "id": "repack",
@@ -447,9 +541,11 @@
       "pattern": "(?i)\\brepack\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/repack.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFCFBBA3"
+      "tagStyle": "filled",
+      "tagColor": "#16B8862B",
+      "textColor": "#FFF1D8",
+      "borderColor": "#FFB8862B",
+      "type": "filter"
     },
     {
       "id": "10bit",
@@ -458,9 +554,11 @@
       "pattern": "(?i)\\b10bit\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/10bit.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFB6B0FC"
+      "tagStyle": "filled",
+      "tagColor": "#14FFFFFF",
+      "textColor": "#F5F7FA",
+      "borderColor": "#FF5E6470",
+      "type": "filter"
     },
     {
       "id": "12bit",
@@ -469,9 +567,11 @@
       "pattern": "(?i)\\b12bit\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/12bit.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFB6B0FC"
+      "tagStyle": "filled",
+      "tagColor": "#14FFFFFF",
+      "textColor": "#F5F7FA",
+      "borderColor": "#FF5E6470",
+      "type": "filter"
     },
     {
       "id": "pt-br",
@@ -480,9 +580,11 @@
       "pattern": "(?i)\\bpt[ ._-]?br\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/pt-br.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF99DAB3"
+      "tagStyle": "filled",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
+      "type": "filter"
     },
     {
       "id": "multi-audio",
@@ -491,20 +593,11 @@
       "pattern": "(?i)\\bmulti[ ._-]?audio\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/multi-audio.svg",
       "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FF99DAB3"
-    },
-    {
-      "id": "dts-hd",
-      "groupId": "audio",
-      "name": "DTS-HD",
-      "pattern": "(?i)\\bdts[ ._-]?hd\\b(?![ ._-]?ma)",
-      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dts-hd.svg",
-      "isEnabled": true,
-      "tagStyle": "none",
-      "tagColor": "#FF191C22",
-      "textColor": "#FFF0B5C9"
+      "tagStyle": "filled",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
+      "type": "filter"
     },
     {
       "id": "audio-en",
@@ -513,7 +606,11 @@
       "pattern": "(?i)(?:Áudio:\\s*|,\\s*)en(?:-[a-z]{2})?\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-en.svg",
       "isEnabled": true,
-      "tagStyle": "none"
+      "tagStyle": "filled",
+      "borderColor": "#FF4D90FF",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "type": "filter"
     },
     {
       "id": "audio-ja",
@@ -522,7 +619,11 @@
       "pattern": "(?i)(?:Áudio:\\s*|,\\s*)ja(?:-[a-z]{2})?\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-ja.svg",
       "isEnabled": true,
-      "tagStyle": "none"
+      "tagStyle": "filled",
+      "borderColor": "#FF4D90FF",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "type": "filter"
     },
     {
       "id": "audio-es",
@@ -531,7 +632,11 @@
       "pattern": "(?i)(?:Áudio:\\s*|,\\s*)es(?:-[a-z]{2})?\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-es.svg",
       "isEnabled": true,
-      "tagStyle": "none"
+      "tagStyle": "filled",
+      "borderColor": "#FF4D90FF",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "type": "filter"
     },
     {
       "id": "audio-fr",
@@ -540,7 +645,11 @@
       "pattern": "(?i)(?:Áudio:\\s*|,\\s*)fr(?:-[a-z]{2})?\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-fr.svg",
       "isEnabled": true,
-      "tagStyle": "none"
+      "tagStyle": "filled",
+      "borderColor": "#FF4D90FF",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "type": "filter"
     },
     {
       "id": "audio-de",
@@ -549,7 +658,11 @@
       "pattern": "(?i)(?:Áudio:\\s*|,\\s*)de(?:-[a-z]{2})?\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-de.svg",
       "isEnabled": true,
-      "tagStyle": "none"
+      "tagStyle": "filled",
+      "borderColor": "#FF4D90FF",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "type": "filter"
     },
     {
       "id": "audio-it",
@@ -558,7 +671,11 @@
       "pattern": "(?i)(?:Áudio:\\s*|,\\s*)it(?:-[a-z]{2})?\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-it.svg",
       "isEnabled": true,
-      "tagStyle": "none"
+      "tagStyle": "filled",
+      "borderColor": "#FF4D90FF",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "type": "filter"
     },
     {
       "id": "audio-ru",
@@ -567,7 +684,11 @@
       "pattern": "(?i)(?:Áudio:\\s*|,\\s*)ru(?:-[a-z]{2})?\\b",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-ru.svg",
       "isEnabled": true,
-      "tagStyle": "none"
+      "tagStyle": "filled",
+      "borderColor": "#FF4D90FF",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "type": "filter"
     },
     {
       "id": "audio-pt",
@@ -576,158 +697,215 @@
       "pattern": "(?i)(?:Áudio:\\s*|,\\s*)pt\\b(?!-BR)",
       "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-pt.svg",
       "isEnabled": true,
-      "tagStyle": "none"
+      "tagStyle": "filled",
+      "borderColor": "#FF4D90FF",
+      "tagColor": "#144D90FF",
+      "textColor": "#F3F7FF",
+      "type": "filter"
     }
   ],
   "groups": [
     {
+      "borderColor": "#FF5E6470",
+      "color": "#F5F7FA",
+      "id": "gr",
+      "isExpanded": true,
+      "name": "Resolution"
+    },
+    {
+      "borderColor": "#FFC8CDD6",
+      "color": "#E5E7EB",
+      "id": "gq",
+      "isExpanded": false,
+      "name": "Quality"
+    },
+    {
+      "borderColor": "#FF5E6470",
+      "color": "#F5F7FA",
+      "id": "gv",
+      "isExpanded": true,
+      "name": "Visual"
+    },
+    {
+      "borderColor": "#00000000",
+      "color": "#2D7FF9",
+      "id": "ga",
+      "isExpanded": true,
+      "name": "Audio"
+    },
+    {
+      "borderColor": "#00000000",
+      "color": "#9CA3AF",
+      "id": "gc",
+      "isExpanded": true,
+      "name": "Channels"
+    },
+    {
+      "id": "edition-imax",
+      "name": "IMAX",
+      "color": "#FFF1D8",
+      "borderColor": "#FFB8862B",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-immersive",
+      "name": "Immersive audio",
+      "color": "#EEF5FF",
+      "borderColor": "#FF2D7FF9",
+      "isExpanded": true
+    },
+    {
+      "id": "visual-vision",
+      "name": "Dolby Vision",
+      "color": "#F1EBFF",
+      "borderColor": "#FF7C4DFF",
+      "isExpanded": true
+    },
+    {
       "id": "resolution",
       "name": "Resolução",
-      "color": "#FF96BFFF",
+      "color": "#F5F7FA",
+      "borderColor": "#FF5E6470",
       "isExpanded": true
     },
     {
       "id": "source",
       "name": "Fonte",
-      "color": "#FF99DAB3",
+      "color": "#EEF4FF",
+      "borderColor": "#FF4A7DFF",
       "isExpanded": true
     },
     {
       "id": "codec",
       "name": "Codec",
-      "color": "#FFB6B0FC",
+      "color": "#F5F7FA",
+      "borderColor": "#FF5E6470",
       "isExpanded": true
     },
     {
       "id": "hdr",
       "name": "Faixa dinâmica",
-      "color": "#FFF5D58D",
+      "color": "#E3E8EF",
+      "borderColor": "#FF5A6472",
       "isExpanded": true
     },
     {
       "id": "audio",
       "name": "Áudio",
-      "color": "#FFF0B5C9",
+      "color": "#E5F2F3",
+      "borderColor": "#FF4F7C82",
       "isExpanded": true
     },
     {
       "id": "channels",
       "name": "Canais",
-      "color": "#FFBBD0D8",
-      "isExpanded": true
-    },
-    {
-      "id": "edition",
-      "name": "Edição",
-      "color": "#FFCFBBA3",
-      "isExpanded": true
-    },
-    {
-      "id": "depth",
-      "name": "Profundidade",
-      "color": "#FFB6B0FC",
-      "isExpanded": true
-    },
-    {
-      "id": "language",
-      "name": "Idiomas",
-      "color": "#FF99DAB3",
-      "isExpanded": true
-    },
-    {
-      "id": "immersive",
-      "name": "Áudio imersivo",
-      "color": "#FFCFBBA3",
-      "isExpanded": true
-    },
-    {
-      "id": "vision",
-      "name": "Dolby Vision",
-      "color": "#FFCFBBA3",
-      "isExpanded": true
-    },
-    {
-      "id": "multi",
-      "name": "Áudio múltiplo",
-      "color": "#FFCFBBA3",
-      "isExpanded": true
-    },
-    {
-      "id": "imax",
-      "name": "IMAX",
-      "color": "#FFCFBBA3",
+      "color": "#C9D1DC",
+      "borderColor": "#FF4B5563",
       "isExpanded": true
     },
     {
       "id": "extended",
       "name": "Extended",
-      "color": "#FFCFBBA3",
+      "color": "#FFF1D8",
+      "borderColor": "#FFB8862B",
       "isExpanded": true
     },
     {
       "id": "director-s-cut",
       "name": "Director’s Cut",
-      "color": "#FFCFBBA3",
+      "color": "#FFF1D8",
+      "borderColor": "#FFB8862B",
       "isExpanded": true
     },
     {
       "id": "proper",
       "name": "Proper",
-      "color": "#FFCFBBA3",
+      "color": "#FFF1D8",
+      "borderColor": "#FFB8862B",
       "isExpanded": true
     },
     {
       "id": "repack",
       "name": "Repack",
-      "color": "#FFCFBBA3",
+      "color": "#FFF1D8",
+      "borderColor": "#FFB8862B",
+      "isExpanded": true
+    },
+    {
+      "id": "depth",
+      "name": "Profundidade",
+      "color": "#F5F7FA",
+      "borderColor": "#FF5E6470",
+      "isExpanded": true
+    },
+    {
+      "id": "language",
+      "name": "Idiomas",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
+      "isExpanded": true
+    },
+    {
+      "id": "multi",
+      "name": "Áudio múltiplo",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     },
     {
       "id": "audio-en",
       "name": "Áudio EN",
-      "color": "#FF99DAB3",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     },
     {
       "id": "audio-ja",
       "name": "Áudio JA",
-      "color": "#FF99DAB3",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     },
     {
       "id": "audio-es",
       "name": "Áudio ES",
-      "color": "#FF99DAB3",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     },
     {
       "id": "audio-fr",
       "name": "Áudio FR",
-      "color": "#FF99DAB3",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     },
     {
       "id": "audio-de",
       "name": "Áudio DE",
-      "color": "#FF99DAB3",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     },
     {
       "id": "audio-it",
       "name": "Áudio IT",
-      "color": "#FF99DAB3",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     },
     {
       "id": "audio-ru",
       "name": "Áudio RU",
-      "color": "#FF99DAB3",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     },
     {
       "id": "audio-pt",
       "name": "Áudio PT",
-      "color": "#FF99DAB3",
+      "color": "#F3F7FF",
+      "borderColor": "#FF4D90FF",
       "isExpanded": true
     }
   ]

@@ -51,7 +51,9 @@ Em **Nuvio → Configurações → Streams → URLs de emblemas Fusion**, import
 https://joaovpimenta.github.io/kazuji-media/badges.json
 ```
 
-O pacote inclui SVGs próprios e regras de qualidade, fonte, codec, HDR, áudio, canais, edição e idiomas. Os metadados também funcionam com outros pacotes cujas regras reconheçam esses termos. No servidor HTTP, a página `/configure` permite copiar a URL `/badges.json` da própria instância; configure `PUBLIC_URL` para os SVGs usarem esse host. Sem `PUBLIC_URL`, os SVGs usam GitHub Pages. O plugin não altera as configurações globais do Nuvio nem importa o pacote pelo usuário.
+O pacote 1.1.5 deriva da [base indicada pelo usuário](https://pastebin.com/raw/mduTTf4M): preserva os 20 ícones originais, cores e bordas, e acrescenta 34 complementos monocromáticos para fonte, codec, áudio, canais, edição e idiomas. As resoluções ficam ativas por padrão; as regras aceitam os rótulos de três linhas e mostram Atmos junto do codec conhecido. Os metadados também funcionam com outros pacotes cujas regras reconheçam esses termos. Veja [a origem e os ajustes](docs/FUSION.md).
+
+No servidor HTTP, a página `/configure` permite copiar a URL `/badges.json` da própria instância; configure `PUBLIC_URL` para os complementos SVG usarem esse host. Sem `PUBLIC_URL`, esses SVGs usam GitHub Pages. Os ícones originais continuam nos endereços dos respectivos autores no GitHub. O plugin não altera as configurações globais do Nuvio nem importa o pacote pelo usuário.
 
 Ative **Emblemas de tamanho** e **Logótipo do addon** no Nuvio. O add-on HTTP mantém o nome real do arquivo em `behaviorHints.filename` e o tamanho em bytes em `behaviorHints.videoSize`. Prioriza os metadados da fonte; aceita tamanhos declarados com unidades SI/IEC e, quando houver teste HTTP, o total válido de `Content-Range` ou `Content-Length` de uma resposta completa. O tamanho de uma amostra parcial ou segmento HLS não vira tamanho total. No plugin JS, o tamanho conhecido aparece em texto e no campo `size`, pois o conversor atual do app não oferece o emblema nativo de tamanho para plugins. O logotipo é declarado nos dois manifestos.
 

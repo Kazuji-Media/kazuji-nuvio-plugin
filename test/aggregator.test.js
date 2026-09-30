@@ -30,8 +30,34 @@ function stream(q,url='https://video.example/'+q+'.mp4',extra={}){return Object.
 function matchedFusionNames(row){
   const pack=require('../badges.json');
   const text=[row.name,row.title,row.description,row.behaviorHints && row.behaviorHints.filename].filter(Boolean).join(' ');
-  return pack.filters.filter(f=>new RegExp(f.pattern.replace(/^\(\?i\)/,''),'i').test(text)).map(f=>f.name);
+  return pack.filters.filter(f=>{
+    const flags=/^\(\?([is]+)\)/.exec(f.pattern);
+    return new RegExp(f.pattern.replace(/^\(\?[is]+\)/,''),flags?flags[1]:'').test(text);
+  }).map(f=>f.name);
 }
+test('derived Fusion pack preserves reference artwork and colors with enabled resolution defaults',()=>{
+  const base=require('../badges.base.json'),derived=require('../badges.json');
+  assert.equal(base.filters.length,20);assert.equal(derived.filters.length,54);
+  assert.equal(new Set(derived.filters.map(f=>f.id)).size,54);
+  for(const original of base.filters){
+    const filter=derived.filters.find(f=>f.id===original.id);assert.ok(filter,original.id);
+    for(const key of ['name','imageURL','borderColor','tagColor','textColor'])assert.equal(filter[key],original[key],original.id+': '+key);
+    assert.equal(filter.isEnabled,true);assert.equal(filter.tagStyle,'filled');
+  }
+  assert.equal(base.filters.filter(f=>!f.isEnabled).length,3);
+});
+test('derived Fusion rules recognize multiline labels and preserve Atmos/codec and DV/HDR10 pairs',async()=>{
+  const s=setup({streams:{'a.example':[stream(2160,undefined,{behaviorHints:{filename:'Movie.2160p.BluRay.Remux.DV.HDR10.TrueHD.Atmos.7.1.mkv'}})]},config:{probeMode:'off',allowUnverified:true}});
+  const row=(await s.run()).streams[0],badges=matchedFusionNames(row);
+  for(const name of ['Remux','DV','HDR10','TrueHD','Atmos','7.1'])assert.ok(badges.includes(name),name);
+  assert.equal(badges.includes('BluRay'),false);
+  assert.equal(badges.includes('DD'),false);
+  assert.equal(row.title.split('\n').length,3);
+  for(const channels of ['8.0','5.0','35.1']){
+    const labels=matchedFusionNames({title:'Film 1080p\n'+channels});
+    assert.equal(labels.includes('7.1'),false);assert.equal(labels.includes('5.1'),false);
+  }
+});
 test('Fusion defaults preserve technical metadata and match the bundled badges in native and HTTP output',async()=>{
   for(const output of ['native','stremio']){
     const filename='Movie.2160p.WEB-DL.x265.HDR10+.DDP5.1.Atmos.IMAX.10bit.mkv';
