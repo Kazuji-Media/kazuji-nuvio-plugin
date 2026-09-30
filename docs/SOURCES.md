@@ -1,42 +1,42 @@
-# Fontes embutidas · 1.2.0
+# Fontes automáticas · 1.2.1
 
-Catálogo fornecido pelo usuário em 30/09/2026. Consultamos somente manifestos; não reproduzimos nem baixamos vídeos. Uma resposta válida de manifesto não comprova disponibilidade dos streams ou suporte a TorBox. Falhas HTTP podem depender da rede/origem e do momento.
+O catálogo nativo recebe uma única chave TorBox por fornecedor. Não oferece campos de manifestos, ativação individual ou URLs personalizadas. Sem chave, consulta oito fontes HTTP públicas; com chave, acrescenta onze add-ons configurados automaticamente. Cada resposta passa pelo filtro HTTP do plugin: hashes, magnets, arquivos `.torrent` e `about:error` são descartados.
 
-Os nove manifestos públicos HTTP válidos começam habilitados. Fenix Flix, BestCine e SuperStream ficam desativados por padrão após 403/timeout nesta consulta; podem ser ativados ou substituídos. Fontes com login/configuração exigem URL personalizada, sem criar endpoints por suposição. Os indexadores públicos ativam com a chave TorBox e só devolvem vídeos resolvidos em cache; sem chave, podem usar um manifesto personalizado que já entregue HTTP.
+A verificação de 30/09/2026 consultou páginas de configuração e manifestos sem baixar vídeos. Os GET de manifestos TorBox usaram uma chave fictícia; isso valida o formato da configuração e o recurso `stream`, não a autenticação ou reprodução. Os POST de configuração foram verificados pelo código das páginas e por testes simulados, sem criar configurações com credenciais reais.
 
-| Fonte | Link fornecido | Uso no plugin | Consulta de manifesto |
-| --- | --- | --- | --- |
-| Frost Stream | [frost](https://froststream.cloutteam.com) | HTTP público habilitado | JSON com recurso stream |
-| Fenix Flix | [fenix](https://fenixflix.fenixhub.online/configure) | HTTP público opcional, desativado | 403 nesta rede |
-| King Vod | [kingvod](https://da5f663b4690-kingvod.baby-beamup.club/manifest.json) | HTTP público habilitado | JSON com recurso stream |
-| BsCine | [bscine](https://bscine.alwaysdata.net/manifest.json) | HTTP público habilitado | JSON com recurso stream |
-| Pop Play | [popplay](https://site--popplay--rg2h4m5nr425.code.run/manifest.json) | HTTP público habilitado | JSON com recurso stream |
-| Mico-Leão Dublado | [mico](https://27a5b2bfe3c0-stremio-brazilian-addon.baby-beamup.club/manifest.json) | HTTP público habilitado | JSON com recurso stream |
-| BestCine | [bestcine](https://bestcine.dpdns.org/) | HTTP público opcional, desativado | 403 nesta rede |
-| SuperStream | [superstream](https://da5f663b4690-superstream.baby-beamup.club) | HTTP público opcional, desativado | Timeout |
-| Zeus | [zeus](https://398fe185fed6-zeus.baby-beamup.club/v1-p1kv-q27) | HTTP público habilitado | JSON com recurso stream |
-| Saimuel | [saimuel](https://saimuelptbr-how6fvsx.manus.space) | Manifesto personalizado obrigatório | Não devolveu JSON de manifesto |
-| UnioFlix | [unioflix](https://bcf125302240-unioflix.baby-beamup.club) | HTTP público habilitado | JSON com recurso stream |
-| BeTor | [betor](https://stremio-betor.onrender.com/) | Chave TorBox ou manifesto HTTP personalizado | JSON com recurso stream |
-| Nyaa Anime BR | [nyaa](https://stremio-br-anime.onrender.com/manifest.json) | Manifesto personalizado obrigatório | Exige configuração; sem recursos públicos |
-| Indexa Br | [indexabr](https://indexabr.vercel.app) | Manifesto personalizado obrigatório | Exige configuração |
-| BrasilRD | [brasilrd](https://brasil-rd-oficial.oniko.org/configure) | Manifesto personalizado obrigatório | JSON com recurso stream |
-| Brazuca Torrents | [brazuca](https://94c8cb9f702d-brazuca-torrents.baby-beamup.club) | Chave TorBox ou manifesto HTTP personalizado | JSON com recurso stream |
-| Torrentio | [torrentio](https://torrentio.strem.fun/providers=comando,bludv,micoleaodublado%7Clanguage=portuguese/manifest.json) | Chave TorBox ou manifesto HTTP personalizado | 403 nesta rede |
-| Magneto | [magneto](https://magneto-jnv5.onrender.com/v1/configure) | Manifesto personalizado obrigatório | 503 |
-| ProwJack | [prowjack](https://prowjack-delta.vercel.app/configure) | Manifesto personalizado obrigatório | Exige configuração |
-| Pengu | [pengu](https://pengu.uk/configure) | Manifesto personalizado obrigatório | Timeout |
-| Media Fusion | [mediafusion](https://mediafusion.elfhosted.com/app/configure) | Manifesto personalizado obrigatório | Timeout |
-| ThePirateBay | [piratebay](https://thepiratebay-plus.strem.fun/manifest.json) | Chave TorBox ou manifesto HTTP personalizado | 403 nesta rede |
-| Meteor | [meteor](https://meteorfortheweebs.midnightignite.me/configure) | Manifesto personalizado obrigatório | Timeout |
-| Corsaro Viola | [corsaro](https://icv.stremio-italia.eu/configure) | Chave TorBox ou manifesto HTTP personalizado | JSON com recurso stream |
-| Comet | [comet](https://comet.elfhosted.com/configure) | Manifesto personalizado obrigatório | Timeout |
-| Orion | [orion](https://5a0d1888fa64-orion.baby-beamup.club/configure) | Manifesto personalizado obrigatório | Exige configuração |
-| TorrentsDB | [torrentsdb](https://torrentsdb.com/configure) | Chave TorBox ou manifesto HTTP personalizado | JSON com recurso stream |
-| Jackettio | [jackettio](https://jackettio.elfhosted.com/configure) | Manifesto personalizado obrigatório | Timeout |
-| Pipe | [pipe](https://pipe.boringways.workers.dev) | Chave TorBox ou manifesto HTTP personalizado | JSON com recurso stream |
-| Nexus | [nexus](https://nexuszen.vercel.app) | HTTP público habilitado | JSON com recurso stream |
+| Fonte | Integração automática | Contrato verificado |
+| --- | --- | --- |
+| [Frost Stream](https://froststream.cloutteam.com) | HTTP público | Manifesto público |
+| [King Vod](https://da5f663b4690-kingvod.baby-beamup.club/manifest.json) | HTTP público | Manifesto público |
+| [BsCine](https://bscine.alwaysdata.net/manifest.json) | HTTP público | Manifesto público |
+| [Pop Play](https://site--popplay--rg2h4m5nr425.code.run/manifest.json) | HTTP público | Manifesto público |
+| [Mico-Leão Dublado](https://27a5b2bfe3c0-stremio-brazilian-addon.baby-beamup.club/manifest.json) | HTTP público | Manifesto público |
+| [Zeus](https://398fe185fed6-zeus.baby-beamup.club/v1-p1kv-q27) | HTTP público | Prefixo fornecido preservado |
+| [UnioFlix](https://bcf125302240-unioflix.baby-beamup.club) | HTTP público | Manifesto público |
+| [Nexus](https://nexuszen.vercel.app) | HTTP público | Manifesto público; usa debrid do serviço |
+| [Torrentio](https://torrentio.strem.fun) | Chave `torbox` na configuração | Seleção BR fornecida, `nodownloadlinks,nocatalog`; GET respondeu 403 nesta rede |
+| [Brazuca Torrents](https://94c8cb9f702d-brazuca-torrents.baby-beamup.club) | Chave `torbox` na configuração | `nodownloadlinks,nocatalog`; manifesto TorBox respondeu 200 |
+| [Comet](https://comet.elfhosted.com/configure) | JSON em Base64, `debridServices` | TorBox, `cachedOnly`, `enableTorrent:false`; manifesto respondeu 200 |
+| [Meteor](https://meteorfortheweebs.midnightignite.me/configure) | JSON em Base64url, `services` | TorBox, `cachedOnly`, `allowP2P:false`; manifesto respondeu 200 |
+| [TorrentsDB](https://torrentsdb.com/configure) | JSON em Base64, `torbox` | `debridoptions` exclui links de download; manifesto respondeu 200 |
+| [Jackettio](https://jackettio.elfhosted.com/configure) | JSON em Base64, `debridId/debridApiKey` | TorBox, `hideUncached`, todas as qualidades do plugin; manifesto respondeu 200 |
+| [Pipe](https://pipe.boringways.workers.dev) | JSON em Base64url, `tb` | `st:http`; manifesto respondeu 200 |
+| [Corsaro Viola](https://icv.stremio-italia.eu/configure) | JSON em Base64url, `use_torbox/torbox_key` | `only_debrid_cache`; manifesto respondeu 200 |
+| [Indexa Br](https://indexabr.vercel.app) | POST `/gerar` com TorBox | Referência `id` gera manifesto; `torrentOnly:false` |
+| [ProwJack](https://prowjack-delta.vercel.app/configure) | POST `/api/config` com `debridConfig` | Referência `userConfig`; TorBox, `enableP2P:false`, `qbitMode:off` |
+| [Media Fusion](https://mediafusion.elfhosted.com/app/configure) | POST `/encrypt-user-data` | Referência `encrypted_str`; provider TorBox com streams em cache; instância pública sem API key adicional |
 
-IDs dos campos: `sourceEnabled_{id}` e `sourceManifest_{id}`. A URL personalizada substitui o manifesto público, e um botão explicitamente desativado prevalece. O limite total é de 64 manifestos deduplicados, incluindo fontes embutidas e extras. As configurações são individuais por fornecedor.
+Os formatos vêm das páginas e bundles publicados pelos próprios add-ons. O Comet também publica o [modelo de configuração](https://github.com/g0ldyy/comet/blob/main/comet/core/models.py) e a [validação](https://github.com/g0ldyy/comet/blob/main/comet/core/config_validation.py); o Torrentio publica o [parser](https://github.com/TheBeastLT/torrentio-scraper/blob/master/addon/lib/configuration.js) e as [opções de debrid](https://github.com/TheBeastLT/torrentio-scraper/blob/master/addon/moch/options.js). Esses serviços são independentes e podem mudar seus contratos.
 
-Nenhuma API key ou URL privada está neste catálogo. O TorBox direto do Kazuji não torna automaticamente compatíveis fontes de login obrigatório, fontes de outros debrid ou catálogos com IDs que não sejam os IMDb/TMDB suportados pelo agregador.
+## Fontes excluídas do catálogo nativo
+
+| Fontes da lista original | Motivo |
+| --- | --- |
+| BeTor, ThePirateBay, Nyaa Anime BR | Não foi identificado um contrato automático TorBox; retornam/ indexam torrents |
+| Pengu, Orion | Exigem login ou credencial adicional ao TorBox |
+| BrasilRD | Integração indicada com Real-Debrid; sem contrato TorBox confirmado |
+| Saimuel | Não forneceu manifesto HTTP utilizável na consulta |
+| Fenix Flix, BestCine | Responderam 403; não foi confirmado um manifesto público utilizável |
+| SuperStream, Magneto | Timeout/503 na consulta; integração automática não confirmada |
+
+Não existe fallback para o manifesto torrent público quando a configuração TorBox falha. Uma fonte indisponível, uma credencial recusada ou uma referência inválida não impede as demais. Controles antigos `sourceEnabled_*`, `sourceManifest_*`, `manifests` e `useBuiltInSources` não alteram o catálogo, mesmo quando salvos em presets ou JSON avançado.

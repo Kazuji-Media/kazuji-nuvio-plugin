@@ -243,8 +243,7 @@ function candidate(stream,source,config,output) {
   const torrentUrl=/^magnet:|^torrent:\/\/|\.torrent(?:[?#]|$)/i.test(stream.url || '');
   const torrent = /^(?:[a-fA-F0-9]{40}|[A-Za-z2-7]{32})$/.test(hash) || torrentUrl;
   const direct = httpUrl(stream.url) && !torrentUrl;
-  // Native output accepts HTTP video only. An optional resolver can convert
-  // cached hashes to signed HTTP links before candidates are ingested.
+  // Native output accepts HTTP video only; debrid conversion belongs to upstream addons.
   const deferred = !direct && (torrent || stream.clientResolve);
   if (deferred && (output !== 'stremio' || config.torrentMode !== 'native')) return null;
   if (!direct && !deferred) return null;
@@ -455,22 +454,21 @@ function createAggregator(options) {
     }
     async function sourceJob(manifestUrl) {
       try {
-        const manifest=await manifestLoads.get(manifestUrl);
+        const loaded=await manifestLoads.get(manifestUrl);
         if (closed) return;
+        if (!loaded) throw new Error('Manifesto indisponível');
+        const {manifest,url}=loaded;
         if (String(manifest.id||'').startsWith('org.kazuji.media.')) return;
         // Do not execute remote native JS manifests; HTTP stream protocol only.
         let id=streamId(ctx,'tt');
         if (!id || !supports(manifest,ctx.type,id)) id=streamId(ctx,'tmdb:');
         if (!id || !supports(manifest,ctx.type,id)) return;
-        const response=await json(resourceUrl(manifestUrl,ctx.type,id),0);
+        const response=await json(resourceUrl(url,ctx.type,id),0);
         stats.sources++;
         if (Array.isArray(response.streams)) {
           const streams=response.streams.slice(0,300);
           const source=String(manifest.name || manifest.id || 'Add-on').replace(/[\r\n]+/g,' ').slice(0,100);
-          // Preserve direct HTTP immediately even if the debrid API stalls.
-          if(output==='native' && options.resolveStreams)ingest(streams,source);
-          const resolved=options.resolveStreams?await options.resolveStreams(streams,{ctx,config,request}):streams;
-          if(!closed)ingest(resolved,source);
+          if(!closed)ingest(streams,source);
         }
       } catch (_) {stats.failures++;}
       finally {pendingSources--;exhausted();}
@@ -482,7 +480,10 @@ function createAggregator(options) {
       let resolve;
       const promise=new Promise(r=>{resolve=r;});
       manifestLoads.set(url,promise);
-      return async()=>{try{resolve(await json(url,600000));}catch(_){resolve(null);}};
+      return async()=>{try{
+        const target=options.prepareManifest?await options.prepareManifest(url,request):url;
+        resolve({manifest:await json(target,600000),url:target});
+      }catch(_){resolve(null);}};
     });
     async function manifestWorker(){while(!closed && manifestIndex<loadTasks.length)await loadTasks[manifestIndex++]();}
     for(let i=0;i<Math.min(config.sourceConcurrency,loadTasks.length);i++)manifestWorker().catch(()=>{});

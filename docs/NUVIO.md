@@ -1,6 +1,6 @@
 # Auditoria do contrato Nuvio
 
-**Atualização Kazuji 1.2.0:** os novos fornecedores por qualidade usam uma chave TorBox explícita em `SCRAPER_SETTINGS` para consultar cache e devolver links HTTP pela API. Isso não usa nem altera a guarda de debrid do app discutida abaixo. Não exige servidor HTTP no Mobile compatível. Consulte [TORBOX.md](TORBOX.md) e [SOURCES.md](SOURCES.md). As seções sobre fontes cadastradas manualmente e qualidades em toggles descrevem o adaptador legado; os novos perfis têm catálogo embutido e qualidade fixa.
+**Atualização Kazuji 1.2.1:** os fornecedores por qualidade usam uma chave TorBox explícita em `SCRAPER_SETTINGS` para configurar add-ons compatíveis automaticamente e receber seus streams HTTP. Não há configuração manual de manifestos nem resolução local de hashes. Fontes exclusivamente torrent e fontes que exigem credenciais extras foram excluídas do catálogo nativo. Não exige servidor HTTP no Mobile compatível. Consulte [TORBOX.md](TORBOX.md) e [SOURCES.md](SOURCES.md). A auditoria abaixo distingue as capacidades do aplicativo do comportamento atual do Kazuji.
 
 Revisão em 29/09/2026, com fontes oficiais fixadas em commits para permitir reprodução:
 
@@ -34,12 +34,12 @@ Fontes:
 
 O manifesto de repositório usa `scrapers`, com `hasSettings: true`. O módulo exporta `onSettings()`; o app chama essa função e renderiza campos `header`, `info`, `text`, `select` e `toggle`. Valores são persistidos e injetados como `SCRAPER_SETTINGS`.
 
-Não há campo `multiselect` nesse renderer. A seleção múltipla de qualidades do Kazuji usa cinco campos `toggle` independentes, convertidos pelo adaptador em uma lista de resoluções. Fontes continuam sendo cadastradas dinamicamente pelo campo de manifestos. A página web usa checkboxes para as mesmas qualidades.
+Não há campo `multiselect` nesse renderer. A seleção múltipla de qualidades do Kazuji usa cinco campos `toggle` independentes, convertidos pelo adaptador em uma lista de resoluções. Nos fornecedores por qualidade a resolução é fixa. No plugin JS as fontes são automáticas; somente o servidor HTTP opcional oferece cadastro de manifestos. A página web usa checkboxes para as mesmas qualidades.
 
 - [Modelo do manifesto](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/plugins/PluginModels.kt#L16-L45)
 - [Renderização/persistência das configurações](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/fullCommonMain/kotlin/com/nuvio/app/features/plugins/PluginSettingsDialog.kt)
 
-O renderer revisado lê `isPassword`, mas não o aplica como transformação de senha ao input. Kazuji não exige digitar chave TorBox nessa interface; prefira a chave TMDB já fornecida pelo app.
+O renderer revisado lê `isPassword`, mas não o aplica como transformação de senha ao input. O campo TorBox do Kazuji é textual e recebe uma chave explícita por fornecedor; a chave TMDB já fornecida pelo app é usada apenas para metadados.
 
 ## Saídas do plugin JS
 
@@ -83,7 +83,7 @@ O registro de APIs do plugin JS inclui fetch, URL, crypto, DOM, WASM e funções
 
 No **Mobile**, `DirectDebridPlaybackResolver.shouldResolveToPlayableStream` exige `stream.isInstalledAddonStream`, e essa propriedade testa se o grupo começa com `addon:`. Grupos de plugin começam com `plugin:` ou `plugin-repo:`.
 
-Para este Kazuji e para TorBox nativo no Mobile, instale a versão **add-on HTTP**. O app recebe os campos completos do recurso stream, reconhece o grupo addon, verifica cache e resolve usando o resolvedor ativo.
+Para delegar hashes ao resolvedor TorBox nativo do Mobile, a versão **add-on HTTP** é necessária. O plugin JS atual usa a configuração TorBox dos add-ons de origem e retorna seus links HTTP diretamente, sem essa delegação. O app recebe os campos completos do recurso stream, reconhece o grupo addon, verifica cache e resolve usando o resolvedor ativo.
 
 - [Guardas e resolução TorBox — DirectDebridResolver.kt](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/debrid/DirectDebridResolver.kt#L112-L129)
 - [Resolução local e credencial ativa](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/debrid/DirectDebridResolver.kt#L201-L295)

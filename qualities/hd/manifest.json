@@ -1,13 +1,13 @@
 {
   "name": "Kazuji Media",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Fontes embutidas, TorBox e fornecedores separados por qualidade.",
   "author": "joaovpimenta",
   "scrapers": [
     {
       "id": "kazuji-hd",
       "name": "HD",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "filename": "provider.js",
       "supportedTypes": [
         "movie",
@@ -15,9 +15,9 @@
       ],
       "enabled": true,
       "hasSettings": true,
-      "description": "Fontes embutidas · HD. Links HTTP e TorBox em cache com sua API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
+      "description": "Fontes automáticas · HD. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
-      "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
+      "logo": "https://raw.githubusercontent.com/joaovpimenta/Kazuji/main/kazuji.png"
     }
   ]
 }

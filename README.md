@@ -4,14 +4,14 @@ Agregador completo de **add-ons Stremio HTTP**, com duas formas de instalação 
 
 | Instalação | Onde executa | Hospedagem | TorBox já conectado ao Nuvio |
 | --- | --- | --- | --- |
-| Plugin JavaScript | No aparelho, Nuvio Mobile Full 0.5.4-beta ou runtime compatível | Manifesto e JS estáticos; GitHub Pages funciona | Com API key no fornecedor, resolve hashes em cache diretamente no TorBox e devolve HTTP |
+| Plugin JavaScript | No aparelho, Nuvio Mobile Full 0.5.4-beta ou runtime compatível | Manifesto e JS estáticos; GitHub Pages funciona | Com API key no fornecedor, configura add-ons TorBox automaticamente e recebe HTTP |
 | Add-on HTTP | Servidor Node.js | Node 22+, Docker opcional, HTTPS | Sim: devolve torrents para a rota de resolução do próprio Nuvio |
 
 **NuvioTV:** use o add-on HTTP. O runtime JS revisado em `dev` possui fetch bloqueante e não disponibiliza timers assíncronos. As versões Play Store/App Store também podem não incluir plugins JS. Veja [a auditoria dos contratos](docs/NUVIO.md).
 
-O plugin JavaScript inclui o catálogo de 30 fontes indicado pelo usuário; credenciais nunca são embutidas. Fontes públicas ficam prontas para consulta, indexadores públicos ativam com a chave TorBox e fontes que exigem configuração/login aceitam seu manifesto personalizado. Este projeto consulta o recurso `stream`; não executa código de outros plugins JS, DEX ou extensões de navegador. O servidor HTTP mantém a configuração explícita de fontes da versão anterior.
+O plugin JavaScript usa fontes HTTP públicas e add-ons que aceitam configuração automática com uma chave TorBox. Não há campos de manifestos nem controles por add-on. Fontes exclusivamente torrent ou que exigem outro login/credencial foram retiradas do catálogo nativo. Este projeto consulta o recurso `stream`; não executa código remoto de plugins JS, DEX ou extensões de navegador. O servidor HTTP opcional mantém sua configuração própria.
 
-## Fornecedores por qualidade · 1.2.0
+## Fornecedores por qualidade · 1.2.1
 
 Adicione em **Plugins** do Nuvio Mobile Full: `https://joaovpimenta.github.io/kazuji-media/manifest.json`. Esse manifesto instala cinco fornecedores. Para instalar somente um, use seu manifesto individual:
 
@@ -29,17 +29,19 @@ Instale o manifesto combinado **ou** os individuais. Instalar ambos duplica forn
 
 ### TorBox sem servidor Kazuji
 
-1. Nas configurações de cada fornecedor, preencha **TorBox · API key**. A chave global de debrid do Nuvio não é importada automaticamente.
-2. Mantenha as fontes embutidas ativadas. Indexadores públicos usam a chave diretamente. Em fontes que exigem login/configuração própria, gere o manifesto na página original e preencha o campo específico; a chave TorBox não substitui esses requisitos.
-3. Use **Manifestos adicionais / TorBox** para outras fontes. O manifesto personalizado substitui o endereço público da respectiva fonte; URLs repetidas são deduplicadas.
+Nas configurações do fornecedor, preencha **TorBox · API key**. Essa única chave configura todos os add-ons compatíveis daquele fornecedor automaticamente. Não é necessário abrir as páginas dos add-ons, gerar links ou preencher manifestos. O Nuvio salva configurações por fornecedor: informe a chave nos fornecedores de qualidade que usar. A chave global de debrid do app não é importada automaticamente.
 
-O plugin consulta o cache, registra somente itens já disponíveis (`add_only_if_cached=true`), consulta os arquivos e obtém a URL HTTPS assinada. Isso adiciona itens em cache à sua conta durante a busca. Padrão: até **4 torrents por fornecedor/busca**, com duas operações simultâneas; o campo aceita até 12. A chave é enviada apenas para `api.torbox.app`, nunca para indexadores; não entra no catálogo, manifestos, bundles ou resultados. O Nuvio salva o valor nas configurações do fornecedor, em campo de texto visível. O endpoint `requestdl` exige o token na query; logs internos do aplicativo/rede podem incluir a URL, embora o Kazuji não a registre.
+Sem chave, as oito fontes HTTP públicas são consultadas. Com chave, são acrescentadas onze integrações TorBox: Torrentio, Brazuca Torrents, Comet, Meteor, TorrentsDB, Jackettio, Pipe, Corsaro Viola, Indexa Br, ProwJack e Media Fusion. As fontes indisponíveis falham isoladamente. O plugin aceita somente URLs HTTP(S) de streams e descarta hashes, magnets, arquivos `.torrent`, `clientResolve` sem HTTP e esquemas como `about:error`. Não converte torrents pela API TorBox.
 
-Torrents fora do cache são ignorados; não há downloads, polling ou P2P no adaptador JS. Links HTTP de fontes, inclusive outros debrid, continuam disponíveis se o TorBox falhar. Qualidade/áudio/compatibilidade são filtrados antes da API. Episódios precisam de um arquivo identificável correspondente; `fileIdx` é tratado como índice e o link usa o ID real do arquivo TorBox. Não converte formatos arbitrários de `clientResolve` de outros serviços nem baixa arquivos `.torrent` sem hash informado.
+A chave é enviada aos add-ons compatíveis, em URLs configuradas ou no corpo de uma requisição HTTPS, conforme o contrato de cada serviço. Indexa Br, ProwJack e Media Fusion geram configurações em seus servidores automaticamente. Referências opacas bem-sucedidas podem ser reutilizadas por dez minutos enquanto o mesmo runtime existir; são separadas por chave. A chave não é embutida nos arquivos publicados nem nas estatísticas do Kazuji. URLs de configuração são credenciais e podem aparecer nos logs de rede do Nuvio. O campo do app é textual.
+
+As integrações pedem links em cache/HTTP quando esse controle existe. A disponibilidade, a geração do link e o cache são responsabilidade dos add-ons e do TorBox. HTTP de erro, redirecionamento ou vídeo de aviso não é comprovado como reprodução válida só por ter URL HTTP; o plugin não solicita os vídeos para testá-los.
+
+Configurações antigas `manifests`, `useBuiltInSources`, `sourceEnabled_*`, `sourceManifest_*` e `torboxMaxResolutions` são ignoradas, inclusive dentro do JSON avançado. Não é necessário apagá-las manualmente. Qualidade e preferências permanecem configuráveis conforme o fornecedor.
 
 Com chave e sem prazos salvos, usa 12 s de seleção e 2,5 s de janela após o primeiro resultado; valores explícitos prevalecem. Os jobs nativos do Nuvio podem continuar depois desse prazo. Cada fornecedor executa isoladamente e pode repetir consultas dos demais. Não houve teste com chave real nem reprodução no aparelho nesta entrega.
 
-Veja [o catálogo e a verificação dos manifestos](docs/SOURCES.md) e [o contrato TorBox](docs/TORBOX.md). Você **não precisa hospedar o servidor HTTP** para usar esses fornecedores no Mobile compatível.
+Veja [as fontes e os contratos verificados](docs/SOURCES.md) e [o fluxo TorBox](docs/TORBOX.md). Você **não precisa hospedar o servidor HTTP** para usar esses fornecedores no Mobile compatível.
 
 ## Como a seleção funciona
 
@@ -107,7 +109,7 @@ Use **Nuvio Mobile Full 0.5.4-beta** ou um runtime com timers assíncronos e `re
 
 1. Disponibilize `manifest.json` e `providers/kazuji.js` em um host HTTPS acessível ao Nuvio, mantendo os caminhos relativos.
 2. Em plugins/repositórios do Nuvio Mobile Full, adicione a URL do `manifest.json`.
-3. Abra as configurações dos fornecedores e informe a API key TorBox, manifestos personalizados e preferências quando necessário. As fontes públicas já estão embutidas.
+3. Abra as configurações dos fornecedores e informe a API key TorBox e suas preferências. As fontes públicas já estão embutidas.
 
 No plugin legado, as qualidades são selecionadas individualmente: **4K, 1080p, 720p, 480p e qualidade desconhecida**. No Mobile, cada opção é um botão liga/desliga; na página web, uma caixa de seleção. Ative uma ou mais. Por padrão, as quatro resoluções conhecidas estão ativas e a desconhecida está desativada. As configurações antigas do campo textual `qualities` continuam funcionando.
 
@@ -120,17 +122,6 @@ https://joaovpimenta.github.io/kazuji-media/manifest.json
 Esse endereço só funciona após a publicação do Pages. O repositório estava **privado** na implementação: o Nuvio não usa sua sessão do GitHub para baixar arquivos privados. Não instale URLs raw temporárias com token de acesso. Pages em repositórios privados depende do plano GitHub; a publicação deve permitir acesso ao app. Não é necessário tornar o repositório público se você hospedar os dois arquivos em outro host.
 
 GitHub Pages hospeda o plugin estático; **não executa o servidor HTTP**.
-
-Exemplo de campo Manifestos (URLs ilustrativas, substitua):
-
-```json
-[
-  "https://addon-a.example/configuracao/manifest.json",
-  "https://addon-b.example/manifest.json"
-]
-```
-
-Aceita uma URL inteira, várias por linha ou separadas por vírgula. Vírgulas internas de uma URL configurada (por exemplo `qualityfilter=threed,480p,scr,cam,unknown`) são preservadas: a vírgula separa fontes somente quando é seguida de outra URL HTTP(S). Para URLs com separadores ambíguos, use o array JSON acima. Em versões anteriores a 1.1.2, URLs com vírgulas internas exigem esse array JSON.
 
 O plugin usa `SCRAPER_SETTINGS`, exporta `onSettings()` e aproveita `TMDB_API_KEY` fornecida pelo Nuvio. Consulte [os contratos verificados](docs/NUVIO.md) antes de usar builds antigos.
 
@@ -193,11 +184,8 @@ Os campos mais usados aparecem na interface. No plugin, use “Configuração av
 
 | Campo | Padrão | Descrição |
 | --- | --- | --- |
-| `manifests` | `[]` | Até 64 URLs HTTP(S), incluindo fontes embutidas. Array, JSON textual ou lista por linha/vírgula |
-| `useBuiltInSources` | `true` no JS | Ativa catálogo; false usa somente manifestos adicionais |
-| `sourceEnabled_{id}` / `sourceManifest_{id}` | Por fonte | Ativação e URL configurada da fonte; IDs em `src/sources.js` |
-| `torboxApiKey` | vazio | Chave local usada pelo plugin JS para resolver hashes em cache; não usada pelo servidor HTTP |
-| `torboxMaxResolutions` | `4` | Até 12 torrents em cache por busca/fornecedor JS |
+| `manifests` | `[]` no servidor | Até 64 URLs HTTP(S) no add-on HTTP; no plugin JS é definido automaticamente e ignora valores manuais |
+| `torboxApiKey` | vazio | Uma chave para configurar automaticamente os add-ons TorBox do fornecedor JS; não usada pelo servidor HTTP |
 | `qualities` | `[2160,1080,720,480]` | Qualidades aceitas; `0` aceita resolução desconhecida |
 | `languages` | `["pt-BR"]` | Primeiro idioma = principal manual; idioma original entra em segundo, demais depois |
 | `resultMode` | `per_language` | `per_language`: grupos qualidade/idioma; `per_quality`: grupos por qualidade; `all`: todas as fontes válidas dentro dos orçamentos/prazos |
@@ -237,7 +225,7 @@ No formulário nativo, os botões são salvos como `quality2160`, `quality1080`,
 
 ### Limites do runtime nativo
 
-O plugin nativo consulta manifestos, metadados TMDB, respostas de streams e a API TorBox quando a chave é preenchida. Não faz HEAD, downloads de amostras nem consultas a playlists/segmentos de vídeo. A velocidade é desconhecida ou apenas declarada pela fonte; a disponibilidade do link será confirmada na reprodução.
+O plugin nativo consulta manifestos, metadados TMDB, respostas de streams e configura automaticamente os add-ons TorBox quando a chave é preenchida. Não faz HEAD, downloads de amostras nem consultas a playlists/segmentos de vídeo. A velocidade é desconhecida ou apenas declarada pela fonte; a disponibilidade do link será confirmada na reprodução.
 
 O Mobile revisado limita cada resposta fetch a 1 MiB e não implementa aborto físico via `fetch(signal)`. Na 0.5.4-beta, QuickJS-kt aguarda todos os jobs nativos da avaliação, inclusive `fetch` e sleeps de timers que `clearTimeout` apenas desativa em JavaScript. O cliente HTTP Android usa timeouts de conexão/leitura/escrita de 60 s, e a execução do plugin também tem limite de 60 s. Portanto **não garantimos retorno em 6,5 s no runtime nativo**. Remover requisições de vídeo elimina a causa observada no diagnóstico, mas manifestos ou metadados pendurados ainda dependem dos limites do app.
 
@@ -253,7 +241,7 @@ npm test
 npm run check
 ```
 
-`src/aggregator.js` contém o motor, `src/provider.js` adapta QuickJS, `src/sources.js` define catálogo/perfis e `src/torbox.js` resolve cache. O build gera todos os manifestos/bundles autocontidos, incluindo `providers/kazuji.js`. Edite os fontes, não os arquivos gerados.
+`src/aggregator.js` contém o motor, `src/provider.js` adapta QuickJS, `src/sources.js` define catálogo, perfis e configuração automática dos add-ons. O build gera todos os manifestos/bundles autocontidos, incluindo `providers/kazuji.js`. Edite os fontes, não os arquivos gerados.
 
 Os testes cobrem corridas, prazo máximo, fontes penduradas, concorrência, deduplicação, idiomas, classificações, preservação de headers/legendas/torrents, HLS e servidor HTTP com upstreams locais. O bundle é executado sem imports Node em um sandbox com o formato de fetch do Nuvio. A CI verifica o bundle e os testes.
 
