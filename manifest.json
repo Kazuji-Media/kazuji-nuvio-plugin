@@ -1,18 +1,18 @@
 {
   "name": "Kazuji Media",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Agrega add-ons HTTP e seleciona fontes por qualidade, áudio e velocidade observada.",
   "author": "joaovpimenta",
   "scrapers": [
     {
       "id": "kazuji-media",
       "name": "Kazuji Media",
-      "version": "1.1.2",
+      "version": "1.1.3",
       "filename": "providers/kazuji.js",
       "supportedTypes": ["movie", "tv"],
       "enabled": true,
       "hasSettings": true,
-      "description": "Nuvio Mobile Full com timers assíncronos. Configure URLs Stremio HTTP nas opções. Para NuvioTV e TorBox conectado, instale o add-on HTTP.",
+      "description": "Nuvio Mobile Full 0.5.4-beta ou runtime compatível. Configure URLs Stremio HTTP. Amostras lentas podem aguardar o timeout do app; consulte as opções. No TV, use o add-on HTTP.",
       "supportsExternalPlayer": true
     }
   ]

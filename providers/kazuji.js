@@ -557,7 +557,8 @@ function nativeTransport(maxConcurrent) {
       } finally {active--;drain();}
     })();
     // Nuvio currently ignores fetch's signal; keep the physical slot until fetch settles.
-    // A timeout only stops awaiting it. The app disposes the runtime after getStreams.
+    // A timeout only stops awaiting it. QuickJS evaluation can still wait for all
+    // native jobs before the app receives getStreams' result; this is not a hard deadline.
     const timeout=new Promise((_,reject)=>{
       timer=setTimeout(()=>reject(new Error('Tempo excedido')),options.timeoutMs);
       if(signal){abortHandler=()=>reject(new Error('Cancelado'));signal.addEventListener('abort',abortHandler);if(signal.aborted)abortHandler();}
@@ -569,7 +570,7 @@ function nativeTransport(maxConcurrent) {
 
 async function getStreams(tmdbId,mediaType,season,episode) {
   if(typeof setTimeout!=='function' || typeof clearTimeout!=='function'){
-    console.warn('[Kazuji] Runtime sem timers assíncronos. Instale a versão HTTP do Kazuji em Add-ons.');
+    console.warn('[Kazuji] Runtime sem timers assíncronos. No Mobile, atualize para Full 0.5.4-beta ou runtime compatível. No TV, use a versão HTTP.');
     return [];
   }
   const settings=Object.assign({},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{});
@@ -598,6 +599,9 @@ function onSettings() {
   const selected=baseQualities(Object.assign({},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{}));
   return [
     {type:'header',label:'Kazuji · Agregador'},
+    {type:'info',label:typeof setTimeout==='function' && typeof clearTimeout==='function'
+      ? 'Requer Nuvio Mobile Full 0.5.4-beta ou runtime compatível. O app pode aguardar requisições de vídeo até o próprio timeout, mesmo após o prazo do plugin. Se ficar carregando ou der erro, desative o teste da fonte e permita alternativas sem velocidade aprovada; isso mantém a busca e os filtros, sem medir velocidade.'
+      : 'Este runtime não oferece os timers exigidos. No Mobile, atualize para Nuvio Full 0.5.4-beta ou runtime compatível. No TV, use o add-on HTTP Kazuji.'},
     text('manifests','Manifestos Stremio HTTP','https://addon.exemplo/manifest.json','Separe URLs por vírgula, ou use um array JSON. Inclua a configuração do próprio add-on na URL. Não aceita repositórios de plugins JavaScript.'),
     {type:'header',label:'Qualidades de vídeo · selecione uma ou mais'},
     ...QUALITY_OPTIONS.map(([q,label])=>({type:'toggle',key:'quality'+q,label,defaultValue:selected.includes(q)})),
@@ -612,7 +616,7 @@ function onSettings() {
     text('allowedRatings','Classificações permitidas','L,10,12','Vazio desativa o filtro. Use os códigos do país escolhido. Padrão BR: L,10,12,14,16,18. Bloqueia todo o título quando não permitido.'),
     text('country','País da classificação','BR','Código ISO: BR, US, GB, etc. Padrão BR.'),
     select('unknownRating','Título sem classificação',[['Bloquear','block'],['Permitir','allow']],'block','Aplicado quando há classificações permitidas configuradas.'),
-    select('probeMode','Teste da fonte',[['Amostra de vídeo','sample'],['Apenas disponibilidade HTTP','head'],['Desativado','off']],'sample','Só a amostra mede velocidade. HLS: testa uma variante e um segmento.'),
+    select('probeMode','Teste da fonte',[['Amostra de vídeo','sample'],['Apenas disponibilidade HTTP','head'],['Desativado','off']],'sample','Só a amostra mede velocidade. No Mobile, requisições lentas podem prender o runtime até o timeout do app. Desativado precisa de alternativas sem velocidade aprovada para mostrar links.'),
     {type:'toggle',key:'allowUnverified',label:'Aceitar alternativas sem velocidade aprovada',defaultValue:false,description:'Pode devolver fontes lentas ou não verificadas. Identificação no nome/descrição.'},
     text('totalTimeoutMs','Prazo total (ms)','6500','De 500 a 20000 ms; inclui consulta TMDB, fontes e testes.'),
     text('settleMs','Janela após primeiro aprovado (ms)','650','0 para devolver imediatamente; maior dá chance a outros idiomas/qualidades.'),

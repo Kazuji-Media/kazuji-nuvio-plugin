@@ -4,7 +4,7 @@ Agregador completo de **add-ons Stremio HTTP**, com duas formas de instalação 
 
 | Instalação | Onde executa | Hospedagem | TorBox já conectado ao Nuvio |
 | --- | --- | --- | --- |
-| Plugin JavaScript | No aparelho, Nuvio Mobile Full com runtime assíncrono | Manifesto e JS estáticos; GitHub Pages funciona | Este adaptador só devolve HTTP; Mobile não resolve plugins pela rota TorBox |
+| Plugin JavaScript | No aparelho, Nuvio Mobile Full 0.5.4-beta ou runtime compatível | Manifesto e JS estáticos; GitHub Pages funciona | Este adaptador só devolve HTTP; Mobile não resolve plugins pela rota TorBox |
 | Add-on HTTP | Servidor Node.js | Node 22+, Docker opcional, HTTPS | Sim: devolve torrents para a rota de resolução do próprio Nuvio |
 
 **NuvioTV:** use o add-on HTTP. O runtime JS revisado em `dev` possui fetch bloqueante e não disponibiliza timers assíncronos. As versões Play Store/App Store também podem não incluir plugins JS. Veja [a auditoria dos contratos](docs/NUVIO.md).
@@ -21,7 +21,7 @@ Não há fontes ou credenciais embutidas. Informe os manifestos já configurados
 6. Baixa uma amostra de até 256 KiB por fonte. A velocidade estimada usa **bytes efetivamente recebidos / tempo de requisição e transferência**.
 7. Após o primeiro resultado aprovado, aguarda uma janela curta (650 ms por padrão) para permitir outras qualidades/idiomas. Retorna, por padrão, **uma fonte por qualidade e idioma**, em ordem decrescente de resolução. Se as fontes/testes terminarem, retorna antes. A quantidade e o agrupamento são configuráveis.
 
-O prazo total padrão é 6,5 segundos, incluindo TMDB. Uma fonte pendurada não prende a resposta. `settleMs: 0` favorece o primeiro resultado; uma janela maior permite mais alternativas. Não é possível devolver imediatamente o primeiro e, simultaneamente, garantir todas as qualidades de fontes ainda pendentes. O Nuvio espera uma única lista por execução, sem atualização incremental dentro do plugin.
+O prazo de seleção padrão é 6,5 segundos, incluindo TMDB. No servidor Node, conexões pendentes são canceladas e uma fonte pendurada não prende a resposta. **No plugin JS, esse prazo não garante o tempo de retorno ao app:** o runtime do Nuvio pode continuar aguardando requisições nativas mesmo depois de o motor concluir a seleção. Veja os limites abaixo. `settleMs: 0` favorece o primeiro resultado; uma janela maior permite mais alternativas. Não é possível devolver imediatamente o primeiro e, simultaneamente, garantir todas as qualidades de fontes ainda pendentes. O Nuvio espera uma única lista por execução, sem atualização incremental dentro do plugin.
 
 Dentro de cada qualidade, prefere o primeiro idioma configurado, depois o idioma original da obra informado pelo TMDB, e então as preferências extras. Exemplo: `languages: ["pt-BR","en"]` com anime originalmente japonês resulta em 4K pt-BR → 4K ja → 4K en → 1080p pt-BR → 1080p ja → 1080p en, quando essas fontes existem. Áudios não preferidos vêm depois; desconhecidos ficam por último. Uma URL com múltiplos áudios entra no grupo de maior preferência, sem duplicação.
 
@@ -52,6 +52,8 @@ Título/ano, direção (filmes), criadores (séries), produtoras e certificaçõ
 O teste do plugin JS ocorre na conexão do aparelho. O teste do add-on HTTP ocorre **na conexão do servidor**, não na conexão do espectador. Um teste curto é uma estimativa daquele momento.
 
 ## Instalar o plugin JavaScript
+
+Use **Nuvio Mobile Full 0.5.4-beta** ou um runtime com timers assíncronos e `response.arrayBuffer()`. A 0.5.1-beta não tem essas APIs; a 0.5.2-beta e a 0.5.3-beta têm leitura de bytes, mas não os timers. Na 0.5.1-beta o Kazuji retorna vazio antes de consultar fontes.
 
 1. Disponibilize `manifest.json` e `providers/kazuji.js` em um host HTTPS acessível ao Nuvio, mantendo os caminhos relativos.
 2. Em plugins/repositórios do Nuvio Mobile Full, adicione a URL do `manifest.json`.
@@ -181,7 +183,17 @@ No formulário nativo, os botões são salvos como `quality2160`, `quality1080`,
 
 ### Limites do runtime nativo
 
-O Mobile revisado limita cada resposta fetch a 1 MiB. Se a fonte ignorar Range, essa quantidade pode ser transferida pelo bridge antes de o plugin receber a amostra. A medição usa apenas os bytes contados da amostra e o tempo completo, de forma conservadora. O bridge não implementa aborto físico via `fetch(signal)`; mantemos o slot ocupado até a chamada terminar e encerramos a espera no prazo. O cancelamento físico depende do descarte do runtime pelo app.
+O Mobile revisado limita cada resposta fetch a 1 MiB. Se a fonte ignorar Range, essa quantidade pode ser transferida pelo bridge antes de o plugin receber a amostra. A medição usa apenas os bytes contados da amostra e o tempo completo, de forma conservadora. O bridge não implementa aborto físico via `fetch(signal)`; mantemos o slot ocupado até a chamada terminar e encerramos a espera do motor no prazo.
+
+Na 0.5.4-beta, QuickJS-kt aguarda todos os jobs nativos da avaliação, inclusive `fetch` e sleeps de timers que `clearTimeout` apenas desativa em JavaScript. O cliente HTTP Android usa timeouts de conexão/leitura/escrita de 60 s, e a execução do plugin também tem limite de 60 s. Uma amostra presa pode manter a tela carregando e provocar erro mesmo que o motor já tenha terminado. Não existe, no contrato revisado, cancelamento HTTP ou timeout por chamada controlável pelo JS. Portanto **não garantimos retorno em 6,5 s no runtime nativo**.
+
+Se o teste do fornecedor ficar carregando e terminar em erro, desative **Teste da fonte** e ative **Aceitar alternativas sem velocidade aprovada**. O equivalente no JSON avançado é:
+
+```json
+{"probeMode":"off","allowUnverified":true}
+```
+
+Isso consulta manifestos/TMDB/streams e mantém os filtros e a ordenação por qualidade/idioma, sem requisitar os vídeos para amostra. A velocidade é desconhecida ou apenas declarada pela fonte; o link ainda precisa ser testado pela reprodução. Se manifestos ou metadados também travarem, o mesmo limite do runtime pode ocorrer. HEAD continua fazendo uma requisição ao vídeo e não garante resolver esse problema. A medição por amostra com cancelamento real exige mudança no bridge/runtime do Nuvio; o adaptador Node já permite cancelar conexões.
 
 No servidor Node a amostra é encerrada assim que o limite de bytes chega, e a conexão é cancelada no timeout/retorno. O prazo JS no aparelho depende de timers realmente assíncronos; fetch bloqueante de versões antigas não é suportado.
 
