@@ -68,6 +68,13 @@ No Mobile, a conversão usa `name` (ou `title` se `name` estiver ausente) como r
 - [Conversão e ordenação — StreamFetchSupport.kt](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamFetchSupport.kt)
 - [Renderização — StreamCard.kt](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamCard.kt)
 
+## Metadados Fusion e tamanho
+
+O Kazuji 1.1.4 inclui termos técnicos reconhecíveis no rótulo/descrição dos dois adaptadores. A conversão JS mantém `name` e monta a descrição com quality/size/language; `size` não é convertido em `behaviorHints.videoSize`. O HTTP preserva `behaviorHints`, preenche `filename` somente com um nome real recebido e fornece `videoSize` numérico quando conhecido. O pacote de emblemas precisa ser importado nas configurações globais pelo usuário.
+
+- [Regras e candidatos de correspondência Fusion](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamBadgeRules.kt)
+- [Imagens e emblema de tamanho](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamBadgeChip.kt)
+
 ## TorBox conectado ao app
 
 O registro de APIs do plugin JS inclui fetch, URL, crypto, DOM, WASM e funções básicas; **não inclui uma API de TorBox nem de credenciais debrid**.
@@ -91,7 +98,18 @@ O motor P2P do app também é separado da rota TorBox e reconhece hashes/URLs to
 
 ## Rede, prazos e NuvioTV
 
-Mobile Full: fetch é uma função nativa assíncrona e timers usam coroutine delay. `arrayBuffer()` expõe os bytes recebidos. O bridge recebe até 1 MiB por resposta, não permite ajustar esse limite pelo argumento fetch e não implementa cancelamento via signal. O runtime possui limite global próprio de 60 s; Kazuji usa prazo menor.
+Mobile Full: fetch é uma função nativa assíncrona e timers usam coroutine delay. `arrayBuffer()` expõe os bytes recebidos. O bridge recebe até 1 MiB por resposta, não permite ajustar esse limite pelo argumento fetch e não implementa cancelamento via signal. O runtime possui limite global próprio de 60 s; o prazo menor do motor Kazuji não é garantia do tempo de retorno ao app.
+
+Revisão adicional nas tags: 0.5.1-beta não tem timers nem arrayBuffer; 0.5.2-beta e 0.5.3-beta têm arrayBuffer, mas não timers; 0.5.4-beta tem ambos. O plugin requer a 0.5.4-beta ou contrato equivalente. A presença dessas APIs permite executar o motor, mas não corrige a falta de cancelamento físico.
+
+**Jobs nativos pendentes:** Nuvio 0.5.4-beta usa QuickJS-kt 1.0.15. `QuickJs.awaitEvaluateResult` espera o resultado e todos os jobs nativos ativos da sessão antes de concluir `evaluate`. O runtime Nuvio aguarda esse evaluate antes de consumir o resultado capturado. `clearTimeout` só remove o callback de uma tabela JavaScript; não cancela o sleep nativo. `fetch(signal)` também não cancela o HTTP. O cliente Android tem timeouts de 60 s e o runtime inteiro tem limite de 60 s. Assim, Promise.race/AbortController no plugin não bastam para entregar resultados rapidamente quando uma requisição nativa fica presa.
+
+No diagnóstico reportado pelo usuário, a busca mostrou fontes após desativar `probeMode` e habilitar `allowUnverified`; isso isola as requisições de amostra como causa do travamento observado. Desde o Kazuji 1.1.3, testes de vídeo (amostra e HEAD) foram removidos do adaptador nativo: `probeMode` fica sempre `off` e `allowUnverified` sempre `true`, inclusive com valores antigos em presets, configurações salvas ou JSON avançado. Esses controles não aparecem mais em `onSettings()`. A ordenação usa velocidade declarada pela fonte quando disponível. Não prova a velocidade nem a reprodução dos links. Corrigir o prazo de ponta a ponta exige cancelamento/timeout no bridge ou encerramento das tarefas nativas assim que o resultado é capturado, com gestão segura do runtime.
+
+- [Runtime na release 0.5.4-beta](https://github.com/NuvioMedia/NuvioMobile/blob/0.5.4-beta/composeApp/src/fullCommonMain/kotlin/com/nuvio/app/features/plugins/runtime/PluginRuntime.kt)
+- [Timers na release 0.5.4-beta](https://github.com/NuvioMedia/NuvioMobile/blob/0.5.4-beta/composeApp/src/fullCommonMain/kotlin/com/nuvio/app/features/plugins/runtime/js/JsBindings.kt)
+- [HTTP Android na release 0.5.4-beta](https://github.com/NuvioMedia/NuvioMobile/blob/0.5.4-beta/composeApp/src/androidMain/kotlin/com/nuvio/app/features/addons/AddonPlatform.android.kt)
+- [QuickJS-kt 1.0.15: awaitEvaluateResult](https://github.com/dokar3/quickjs-kt/blob/v1.0.15/quickjs/src/jniMain/kotlin/com/dokar/quickjs/QuickJs.jni.kt)
 
 A polyfill URL do Mobile não sincroniza mutações de pathname/search com href. Kazuji monta as URLs do protocolo e resolve caminhos HLS explicitamente, sem depender desse comportamento. O teste do bundle não injeta a classe URL do Node.
 

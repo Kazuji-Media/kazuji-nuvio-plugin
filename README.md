@@ -4,7 +4,7 @@ Agregador completo de **add-ons Stremio HTTP**, com duas formas de instalação 
 
 | Instalação | Onde executa | Hospedagem | TorBox já conectado ao Nuvio |
 | --- | --- | --- | --- |
-| Plugin JavaScript | No aparelho, Nuvio Mobile Full com runtime assíncrono | Manifesto e JS estáticos; GitHub Pages funciona | Este adaptador só devolve HTTP; Mobile não resolve plugins pela rota TorBox |
+| Plugin JavaScript | No aparelho, Nuvio Mobile Full 0.5.4-beta ou runtime compatível | Manifesto e JS estáticos; GitHub Pages funciona | Este adaptador só devolve HTTP; Mobile não resolve plugins pela rota TorBox |
 | Add-on HTTP | Servidor Node.js | Node 22+, Docker opcional, HTTPS | Sim: devolve torrents para a rota de resolução do próprio Nuvio |
 
 **NuvioTV:** use o add-on HTTP. O runtime JS revisado em `dev` possui fetch bloqueante e não disponibiliza timers assíncronos. As versões Play Store/App Store também podem não incluir plugins JS. Veja [a auditoria dos contratos](docs/NUVIO.md).
@@ -17,15 +17,15 @@ Não há fontes ou credenciais embutidas. Informe os manifestos já configurados
 2. Libera as buscas de streams somente após passar pelo filtro de idade.
 3. Consulta os add-ons em paralelo, respeitando tipos e prefixos de IDs anunciados no manifesto.
 4. Normaliza qualidade e idioma de áudio, preserva headers e legendas, remove duplicatas.
-5. Prioriza 4K → 1080p → 720p → 480p na fila de testes; testa fontes em paralelo.
-6. Baixa uma amostra de até 256 KiB por fonte. A velocidade estimada usa **bytes efetivamente recebidos / tempo de requisição e transferência**.
-7. Após o primeiro resultado aprovado, aguarda uma janela curta (650 ms por padrão) para permitir outras qualidades/idiomas. Retorna, por padrão, **uma fonte por qualidade e idioma**, em ordem decrescente de resolução. Se as fontes/testes terminarem, retorna antes. A quantidade e o agrupamento são configuráveis.
+5. Ordena por 4K → 1080p → 720p → 480p e por preferência de áudio.
+6. No plugin nativo, usa a velocidade declarada pela fonte, quando disponível, **sem requisitar os vídeos**. O add-on HTTP pode testar amostras em paralelo no servidor.
+7. Após a primeira fonte aceita, aguarda uma janela curta (650 ms por padrão) para permitir outras qualidades/idiomas. Retorna, por padrão, **uma fonte por qualidade e idioma**, em ordem decrescente de resolução. Se as buscas terminarem, retorna antes. A quantidade e o agrupamento são configuráveis.
 
-O prazo total padrão é 6,5 segundos, incluindo TMDB. Uma fonte pendurada não prende a resposta. `settleMs: 0` favorece o primeiro resultado; uma janela maior permite mais alternativas. Não é possível devolver imediatamente o primeiro e, simultaneamente, garantir todas as qualidades de fontes ainda pendentes. O Nuvio espera uma única lista por execução, sem atualização incremental dentro do plugin.
+O prazo de seleção padrão é 6,5 segundos, incluindo TMDB. No servidor Node, conexões pendentes são canceladas e uma fonte pendurada não prende a resposta. **No plugin JS, esse prazo não garante o tempo de retorno ao app:** o runtime do Nuvio pode continuar aguardando requisições nativas mesmo depois de o motor concluir a seleção. Veja os limites abaixo. `settleMs: 0` favorece o primeiro resultado; uma janela maior permite mais alternativas. Não é possível devolver imediatamente o primeiro e, simultaneamente, garantir todas as qualidades de fontes ainda pendentes. O Nuvio espera uma única lista por execução, sem atualização incremental dentro do plugin.
 
 Dentro de cada qualidade, prefere o primeiro idioma configurado, depois o idioma original da obra informado pelo TMDB, e então as preferências extras. Exemplo: `languages: ["pt-BR","en"]` com anime originalmente japonês resulta em 4K pt-BR → 4K ja → 4K en → 1080p pt-BR → 1080p ja → 1080p en, quando essas fontes existem. Áudios não preferidos vêm depois; desconhecidos ficam por último. Uma URL com múltiplos áudios entra no grupo de maior preferência, sem duplicação.
 
-Dentro do mesmo grupo de idioma, fontes aprovadas precedem alternativas não verificadas e a maior velocidade prevalece. Usa a velocidade medida por amostra; se indisponível, aceita os campos numéricos `speedMbps` ou `downloadSpeedMbps` da fonte como informação **declarada**, sem convertê-la em aprovação. O campo genérico `speed` não é usado porque suas unidades são ambíguas. As velocidades mínimas padrão são 20 / 6 / 3 / 1 Mbps para 4K / 1080 / 720 / 480. São limites configuráveis, não uma garantia de reprodução: bitrate, codec, HDR, aparelho e oscilação de rede também influenciam.
+Dentro do mesmo grupo de idioma, a maior velocidade informada prevalece no plugin nativo. No add-on HTTP, fontes aprovadas precedem alternativas não verificadas e a velocidade medida por amostra prevalece. Se indisponível, aceita os campos numéricos `speedMbps` ou `downloadSpeedMbps` da fonte como informação **declarada**, sem convertê-la em aprovação. O campo genérico `speed` não é usado porque suas unidades são ambíguas. No add-on HTTP, as velocidades mínimas padrão são 20 / 6 / 3 / 1 Mbps para 4K / 1080 / 720 / 480. São limites configuráveis, não uma garantia de reprodução: bitrate, codec, HDR, aparelho e oscilação de rede também influenciam.
 
 O Nuvio não injeta o idioma do aparelho no plugin: configure-o manualmente, com padrão `pt-BR`. O TMDB informa a língua original, normalmente sem região; o Kazuji não inventa `en-US` a partir de `en`. O app Mobile pode reordenar a lista alfabeticamente; a ordem devolvida pelo plugin não garante a ordem visual. Veja [a auditoria](docs/NUVIO.md).
 
@@ -34,14 +34,30 @@ O Nuvio não injeta o idioma do aparelho no plugin: configure-o manualmente, com
 O rótulo nativo (`name`) contém três linhas; `title` repete o conteúdo para consumidores que o utilizam:
 
 ```text
-Nome da obra (2024) · 4K · pt-BR
+Nome da obra (2024) · 4K · Áudio: pt-BR · WEB-DL · HEVC · HDR10+ · DD+ · 5.1
 Diretor/criador · Estúdio
-Classificação BR: 12 · 35.2 Mbps (amostra) · Nome da fonte
+Classificação BR: 12 · 35.2 Mbps (fonte informa; não verificado) · 4.5 GB · Nome da fonte
 ```
 
 Título/ano, direção (filmes), criadores (séries), produtoras e certificações vêm do TMDB. Séries mostram o ano de estreia e a classificação da série. Campos ausentes aparecem como “não informado”; classificação de outro país não substitui silenciosamente a do país escolhido. No add-on HTTP, o nome do grupo identifica qualidade/idioma e `title` contém as três linhas. A disposição/truncamento final depende da versão do aplicativo.
 
-### O que os testes de fonte cobrem
+### Emblemas Fusion (padrão automático)
+
+A partir da 1.1.4, o Kazuji prepara os termos de resolução, fonte (REMUX/BluRay/WEB-DL/WEBRip), codec, HDR/Dolby Vision, áudio, canais, edição e profundidade de cor automaticamente. Usa o nome original do arquivo, campos declarados e metadados `clientResolve` disponíveis. Não exige nova configuração nem consultas extras; mantém os filtros e preferências existentes. Informações desconhecidas são omitidas: sucesso na reprodução não comprova HEVC, HDR, Atmos ou áudio dublado. Legendas e idioma original do TMDB não viram emblemas de áudio.
+
+Em **Nuvio → Configurações → Streams → URLs de emblemas Fusion**, importe uma vez:
+
+```text
+https://joaovpimenta.github.io/kazuji-media/badges.json
+```
+
+O pacote inclui SVGs próprios e regras de qualidade, fonte, codec, HDR, áudio, canais, edição e idiomas. Os metadados também funcionam com outros pacotes cujas regras reconheçam esses termos. No servidor HTTP, a página `/configure` permite copiar a URL `/badges.json` da própria instância; configure `PUBLIC_URL` para os SVGs usarem esse host. Sem `PUBLIC_URL`, os SVGs usam GitHub Pages. O plugin não altera as configurações globais do Nuvio nem importa o pacote pelo usuário.
+
+Ative **Emblemas de tamanho** e **Logótipo do addon** no Nuvio. O add-on HTTP mantém o nome real do arquivo em `behaviorHints.filename` e o tamanho em bytes em `behaviorHints.videoSize`. Prioriza os metadados da fonte; aceita tamanhos declarados com unidades SI/IEC e, quando houver teste HTTP, o total válido de `Content-Range` ou `Content-Length` de uma resposta completa. O tamanho de uma amostra parcial ou segmento HLS não vira tamanho total. No plugin JS, o tamanho conhecido aparece em texto e no campo `size`, pois o conversor atual do app não oferece o emblema nativo de tamanho para plugins. O logotipo é declarado nos dois manifestos.
+
+O preparo Fusion não inicia testes de vídeo no plugin JS. A posição dos emblemas e a ativação do pacote continuam sendo opções do Nuvio.
+
+### Testes de fonte no add-on HTTP
 
 - URLs diretas HTTP(S): amostra com `Range`; respostas HTTP inválidas, HTML/JSON e amostras pequenas não viram resultados aprovados.
 - HLS: segue playlists, escolhe variante com a resolução anunciada e testa um segmento. Também detecta playlists em URLs sem extensão.
@@ -49,9 +65,11 @@ Título/ano, direção (filmes), criadores (séries), produtoras e certificaçõ
 - HEAD confirma somente resposta HTTP, sem medir throughput. Precisa da opção de alternativas para aparecer.
 - Torrents e `clientResolve`: são alternativas delegadas ao Nuvio no modo HTTP. **Não são testados antes da resolução** e ficam depois de links aprovados do mesmo grupo de qualidade/idioma. O limite configurado pode ocultá-los se esse grupo já tiver fontes melhores.
 
-O teste do plugin JS ocorre na conexão do aparelho. O teste do add-on HTTP ocorre **na conexão do servidor**, não na conexão do espectador. Um teste curto é uma estimativa daquele momento.
+O plugin JS não testa vídeos. Esses testes são exclusivos do add-on HTTP e ocorrem **na conexão do servidor**, não na conexão do espectador. Um teste curto é uma estimativa daquele momento.
 
 ## Instalar o plugin JavaScript
+
+Use **Nuvio Mobile Full 0.5.4-beta** ou um runtime com timers assíncronos e `response.arrayBuffer()`. A 0.5.1-beta não tem essas APIs; a 0.5.2-beta e a 0.5.3-beta têm leitura de bytes, mas não os timers. Na 0.5.1-beta o Kazuji retorna vazio antes de consultar fontes.
 
 1. Disponibilize `manifest.json` e `providers/kazuji.js` em um host HTTPS acessível ao Nuvio, mantendo os caminhos relativos.
 2. Em plugins/repositórios do Nuvio Mobile Full, adicione a URL do `manifest.json`.
@@ -137,7 +155,7 @@ Aceita IDs IMDb (`tt123...`) e TMDB (`tmdb:123...`), com codificação URL norma
 
 ## Configuração
 
-Os campos mais usados aparecem na interface. No plugin, use “Configuração avançada JSON” para os demais. No servidor, a página oferece o mesmo campo; `KAZUJI_CONFIG_FILE` também aceita todo o objeto.
+Os campos mais usados aparecem na interface. No plugin, use “Configuração avançada JSON” para os demais. No servidor, a página oferece o mesmo campo; `KAZUJI_CONFIG_FILE` também aceita todo o objeto. **Desde a 1.1.3, o plugin nativo sempre usa `probeMode: "off"` e `allowUnverified: true`**, após ler presets, configurações salvas e JSON avançado. Valores antigos não reativam testes nem bloqueiam todas as fontes por ausência de teste. Os controles de testes foram removidos da interface nativa; os campos de amostra da tabela aplicam-se apenas ao servidor.
 
 | Campo | Padrão | Descrição |
 | --- | --- | --- |
@@ -155,7 +173,7 @@ Os campos mais usados aparecem na interface. No plugin, use “Configuração av
 | `allowedRatings` | `[]` | Códigos exatos permitidos; vazio desativa filtro |
 | `unknownRating` | `block` | Bloquear ou permitir quando a classificação é desconhecida |
 | `totalTimeoutMs` | `6500` | Prazo global de 500–20000 ms |
-| `settleMs` | `650` | Janela de 0–3000 ms após primeiro aprovado/delegado |
+| `settleMs` | `650` | Janela de 0–3000 ms após primeira fonte aceita |
 | `requestTimeoutMs` | `2200` | Prazo por requisição de metadados/fonte |
 | `probeTimeoutMs` | `1400` | Prazo de todo o teste, inclusive etapas HLS |
 | `sourceConcurrency` | `8` | Concorrência por etapa de fontes |
@@ -164,8 +182,8 @@ Os campos mais usados aparecem na interface. No plugin, use “Configuração av
 | `maxProbes` | `24` | Orçamento de testes por busca |
 | `sampleBytes` | `262144` | Tamanho da amostra; 32–512 KiB |
 | `minMbps` | `{"2160":20,"1080":6,"720":3,"480":1,"0":1}` | Mínimo observado por qualidade |
-| `probeMode` | `sample` | `sample`, `head` ou `off` |
-| `allowUnverified` | `false` | Permite alternativas não aprovadas; nunca recupera fontes HTTP inválidas |
+| `probeMode` | `sample` no HTTP; `off` no JS | `sample`, `head` ou `off` no HTTP; sempre `off` no plugin |
+| `allowUnverified` | `false` no HTTP; `true` no JS | No HTTP, permite alternativas não aprovadas; no JS, devolve links sem teste de vídeo |
 | `torrentMode` | `off` | `native` delega torrents/debrid ao Nuvio, exclusivamente pelo add-on HTTP |
 | `tmdbApiKey` | vazio | Sobrescreve chave TMDB; normalmente use chave do app ou variável do servidor |
 
@@ -181,9 +199,11 @@ No formulário nativo, os botões são salvos como `quality2160`, `quality1080`,
 
 ### Limites do runtime nativo
 
-O Mobile revisado limita cada resposta fetch a 1 MiB. Se a fonte ignorar Range, essa quantidade pode ser transferida pelo bridge antes de o plugin receber a amostra. A medição usa apenas os bytes contados da amostra e o tempo completo, de forma conservadora. O bridge não implementa aborto físico via `fetch(signal)`; mantemos o slot ocupado até a chamada terminar e encerramos a espera no prazo. O cancelamento físico depende do descarte do runtime pelo app.
+O plugin nativo consulta somente manifestos, metadados TMDB e respostas de streams. Não faz HEAD, downloads de amostras nem consultas a playlists/segmentos de vídeo. A velocidade é desconhecida ou apenas declarada pela fonte; a disponibilidade do link será confirmada na reprodução.
 
-No servidor Node a amostra é encerrada assim que o limite de bytes chega, e a conexão é cancelada no timeout/retorno. O prazo JS no aparelho depende de timers realmente assíncronos; fetch bloqueante de versões antigas não é suportado.
+O Mobile revisado limita cada resposta fetch a 1 MiB e não implementa aborto físico via `fetch(signal)`. Na 0.5.4-beta, QuickJS-kt aguarda todos os jobs nativos da avaliação, inclusive `fetch` e sleeps de timers que `clearTimeout` apenas desativa em JavaScript. O cliente HTTP Android usa timeouts de conexão/leitura/escrita de 60 s, e a execução do plugin também tem limite de 60 s. Portanto **não garantimos retorno em 6,5 s no runtime nativo**. Remover requisições de vídeo elimina a causa observada no diagnóstico, mas manifestos ou metadados pendurados ainda dependem dos limites do app.
+
+No servidor Node, os testes de vídeo continuam opcionais. A amostra é encerrada assim que o limite de bytes chega, e a conexão é cancelada no timeout/retorno. O prazo JS no aparelho depende de timers realmente assíncronos; fetch bloqueante de versões antigas não é suportado.
 
 ## Desenvolvimento e verificação
 
