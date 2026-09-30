@@ -3,6 +3,8 @@ WORKDIR /app
 COPY --chown=node:node package.json ./
 COPY --chown=node:node src ./src
 COPY --chown=node:node public ./public
+COPY --chown=node:node badges.json ./badges.json
+COPY --chown=node:node assets ./assets
 RUN mkdir -p /app/data && chown node:node /app/data
 USER node
 ENV PORT=7000 DATA_DIR=/app/data

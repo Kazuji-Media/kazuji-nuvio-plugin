@@ -116,9 +116,10 @@ function language(raw) {
   return aliases[s] || (/^[a-z]{2,3}(-[a-z]{2})?$/.test(s) ? s : '');
 }
 function audioLanguages(stream) {
-  const explicit = list(stream.languages || stream.language || stream.audioLanguages || []);
+  const parsed = parsedStream(stream);
+  const explicit = list(stream.languages || stream.language || stream.audioLanguages || parsed.languages || []);
   const result = explicit.map(language).filter(Boolean);
-  const text = [stream.title, stream.description, stream.name, stream.behaviorHints && stream.behaviorHints.filename].filter(Boolean).join(' ').toLowerCase();
+  const text = releaseText(stream).toLowerCase();
   for (const [regex,code] of [
     [/\b(pt[ ._-]?br|pob|brazilian|portugu[eê]s brasileiro|dublado)\b/, 'pt-BR'],
     [/\b(portugu[eê]s|portuguese|por|pt)\b/,'pt'], [/\b(english|eng|en)\b/,'en'],
@@ -134,9 +135,10 @@ function codec(raw) {
   return /^(h264|x264|avc|avc1)$/.test(s)?'h264':/^(h265|x265|hevc|hev1|hvc1)$/.test(s)?'hevc':/^(av1|av01)$/.test(s)?'av1':'';
 }
 function compatibility(stream) {
-  const text=[stream.codec,stream.videoCodec,stream.hdr,stream.dynamicRange,stream.name,stream.title,stream.description,stream.behaviorHints && stream.behaviorHints.filename].filter(Boolean).join(' ');
+  const parsed=parsedStream(stream);
+  const text=[stream.codec,stream.videoCodec,stream.hdr,stream.dynamicRange,parsed.codec,parsed.hdr,releaseText(stream)].filter(Boolean).join(' ');
   const videoCodec=codec(stream.videoCodec||stream.codec) || (/\b(h[ ._-]?264|x264|avc)\b/i.test(text)?'h264':/\b(h[ ._-]?265|x265|hevc)\b/i.test(text)?'hevc':/\bav1\b/i.test(text)?'av1':'');
-  const range=/\b(dolby[ ._-]?vision|dovi|dv)\b/i.test(text)?'dv':/\b(hdr(?:10\+?)?|hlg)\b/i.test(text)?'hdr':stream.hdr===false || /\bsdr\b/i.test(text)?'sdr':'';
+  const range=/\b(dolby[ ._-]?vision|dovi|dv)\b/i.test(text)?'dv':stream.hdr===true || /\b(hdr(?:10\+?)?|hlg)\b/i.test(text)?'hdr':stream.hdr===false || /\bsdr\b/i.test(text)?'sdr':'';
   return {codec:videoCodec,range};
 }
 function compatibilityAllowed(info,config) {
@@ -159,7 +161,8 @@ function quality(stream) {
     if (/^(2160p?|4k|uhd)$/i.test(declared)) return 2160;
     if (/^(1080|720|480)p?$/i.test(declared)) return Number(declared.replace(/p$/i,''));
   }
-  const s = [stream.quality,stream.name,stream.title,stream.description,stream.behaviorHints && stream.behaviorHints.filename].filter(Boolean).join(' ');
+  const parsed=parsedStream(stream);
+  const s = [stream.quality,parsed.resolution,releaseText(stream)].filter(Boolean).join(' ');
   if (/\b(2160p?|4k|uhd)\b/i.test(s)) return 2160;
   for (const q of [1080,720,480]) if (new RegExp('\\b'+q+'p?\\b','i').test(s)) return q;
   return 0;
@@ -270,6 +273,68 @@ function selectResults(candidates,config) {
     if(count>=config.resultsPerGroup)return false;
     counts.set(group,count+1);return true;
   });
+}
+
+// Only release metadata is evidence of technical properties. TMDB credits,
+// subtitle languages, URL tokens and successful probes do not imply codec/HDR/audio.
+function parsedStream(stream) {
+  const resolve=stream.clientResolve || {};
+  const raw=resolve.stream && resolve.stream.raw || {};
+  return raw.parsed || {};
+}
+function releaseFilename(stream) {
+  const resolve=stream.clientResolve || {},raw=resolve.stream && resolve.stream.raw || {};
+  return [stream.behaviorHints && stream.behaviorHints.filename,stream.filename,raw.filename,resolve.filename]
+    .find(x=>typeof x==='string' && x.trim()) || '';
+}
+function releaseText(stream) {
+  const resolve=stream.clientResolve || {},raw=resolve.stream && resolve.stream.raw || {},parsed=parsedStream(stream);
+  return [releaseFilename(stream),raw.torrentName,resolve.torrentName,parsed.rawTitle,parsed.parsedTitle,
+    stream.name,stream.title,stream.description].filter(x=>typeof x==='string').join(' ');
+}
+function positiveBytes(value) {
+  const n=typeof value==='number'?value:typeof value==='string' && /^\d+$/.test(value.trim())?Number(value):NaN;
+  return Number.isSafeInteger(n) && n>0?n:undefined;
+}
+function streamSize(stream) {
+  const resolve=stream.clientResolve || {},raw=resolve.stream && resolve.stream.raw || {};
+  for(const value of [stream.behaviorHints && stream.behaviorHints.videoSize,stream.size,stream.fileSize,raw.size]) {
+    const bytes=positiveBytes(value);if(bytes)return bytes;
+  }
+  // A formatted size is an approximate declaration, with explicit SI/IEC units.
+  const text=[typeof stream.size==='string'?stream.size:'',stream.description,stream.title].filter(Boolean).join(' ');
+  const match=/\b(\d+(?:[.,]\d+)?)\s*(KiB|MiB|GiB|TiB|KB|MB|GB|TB)\b/i.exec(text);
+  if(!match)return undefined;
+  const unit=match[2].toUpperCase(),power={K:1,M:2,G:3,T:4}[unit[0]];
+  return positiveBytes(Math.round(Number(match[1].replace(',','.'))*Math.pow(unit.includes('I')?1024:1000,power)));
+}
+function sizeLabel(bytes) {
+  const units=['B','KB','MB','GB','TB'];let value=bytes,i=0;
+  while(value>=1000 && i<units.length-1){value/=1000;i++;}
+  return (i?value.toFixed(2).replace(/\.?0+$/,''):String(value))+' '+units[i];
+}
+function fusionTags(c) {
+  const s=c.raw,p=parsedStream(s);
+  const text=[releaseText(s),s.source,p.quality,s.videoCodec,s.codec,p.codec,s.hdr,s.dynamicRange,p.hdr,
+    s.audioCodec,s.audio,p.audio,s.channels,p.channels,s.edition,p.edition,s.bitDepth].filter(Boolean).join(' ');
+  const tags=[];
+  function first(patterns){for(const [pattern,label]of patterns)if(pattern.test(text)){tags.push(label);break;}}
+  first([[/\bremux\b/i,'REMUX'],[/\b(?:blu[ ._-]?ray|b[dr]rip)\b/i,'BluRay'],[/\bweb[ ._-]?dl\b/i,'WEB-DL'],[/\bwebrip\b/i,'WEBRip'],[/\b(?:hdcam|camrip|cam)\b/i,'HDCAM'],[/\bdvdrip\b/i,'DVDRip']]);
+  const declaredCodec=codec(s.videoCodec||s.codec||p.codec);
+  if(declaredCodec)tags.push({h264:'AVC',hevc:'HEVC',av1:'AV1'}[declaredCodec]);
+  else first([[/\b(?:h[ ._-]?265|x265|hevc|hev1|hvc1)\b/i,'HEVC'],[/\b(?:h[ ._-]?264|x264|avc|avc1)\b/i,'AVC'],[/\b(?:av1|av01)\b/i,'AV1'],[/\bvp9\b/i,'VP9']]);
+  // Dolby Vision may legitimately also have an HDR10 fallback layer.
+  if(/\b(?:dolby[ ._-]?vision|dovi|dv)\b/i.test(text))tags.push('Dolby Vision');
+  first([[/\bhdr10(?:\+|plus)/i,'HDR10+'],[/\bhdr10\b/i,'HDR10'],[/\bhlg\b/i,'HLG'],[/\bhdr\b/i,'HDR'],[/\bsdr\b/i,'SDR']]);
+  if(s.hdr===true && !tags.some(x=>/HDR|HLG|Dolby Vision/.test(x)))tags.push('HDR');
+  if(s.hdr===false && !tags.some(x=>/HDR|HLG|Dolby Vision|SDR/.test(x)))tags.push('SDR');
+  if(/\b(?:atmos|dolby[ ._-]?atmos)\b/i.test(text))tags.push('Atmos');
+  first([[/\bdts[ .:_-]?x\b/i,'DTS:X'],[/\btrue[ ._-]?hd\b/i,'TrueHD'],[/\bdts[ ._-]?hd[ ._-]?ma\b/i,'DTS-HD MA'],[/\bdts[ ._-]?hd\b/i,'DTS-HD'],[/\b(?:e[ ._-]?ac[ ._-]?3|ddp|dd\+|dolby[ ._-]?digital[ ._-]?plus)/i,'DD+'],[/\b(?:ac[ ._-]?3|dd|dolby[ ._-]?digital)(?=\b|\d)/i,'Dolby Digital'],[/\bdts(?=\b|\d)/i,'DTS'],[/\baac(?=\b|\d)/i,'AAC'],[/\bflac\b/i,'FLAC'],[/\b(?:lpcm|pcm)\b/i,'PCM'],[/\bmp3\b/i,'MP3']]);
+  // DDP5.1/AAC2.0 are common release spellings without a word boundary.
+  first([[/(?:^|[^0-9])7\.1\b/,'7.1'],[/(?:^|[^0-9])6\.1\b/,'6.1'],[/(?:^|[^0-9])5\.1\b/,'5.1'],[/(?:^|[^0-9])2\.0\b|\bstereo\b/i,'2.0'],[/\bmono\b/i,'1.0']]);
+  for(const [pattern,label]of [[/\bimax\b/i,'IMAX'],[/\bextended\b/i,'EXTENDED'],[/\bdirector'?s[ ._-]?cut\b/i,"Director's Cut"],[/\bproper\b/i,'PROPER'],[/\brepack\b/i,'REPACK'],[/\b(?:10[ ._-]?bit|hi10p)\b/i,'10bit'],[/\b12[ ._-]?bit\b/i,'12bit']])if(pattern.test(text))tags.push(label);
+  if(c.langs.length>1)tags.push('MULTI AUDIO');
+  return tags;
 }
 
 function createAggregator(options) {
@@ -452,7 +517,8 @@ async function probe(c,config,request,now,initialPlaylist,startedAt) {
   if (config.probeMode==='head') {
     const head=await request(c.raw.url,Object.assign({},params,{method:'HEAD',maxBytes:0}));
     if (head.status<200 || head.status>=300 || /text\/html|application\/json/i.test(head.headers['content-type'] || '')) throw new Error('Não é vídeo');
-    return {verified:false,method:'HEAD',latencyMs:now()-start};
+    const videoSize=head.status===200 && !/hls|dash/i.test(c.raw.type||'') && !/\.(?:m3u8|mpd)(?:[?#]|$)/i.test(c.raw.url) && !/mpegurl|dash\+xml/i.test(head.headers['content-type']||'')?positiveBytes(head.headers['content-length']):undefined;
+    return {verified:false,method:'HEAD',latencyMs:now()-start,videoSize};
   }
   let url=c.raw.url;
   if (/\.mpd(?:[?#]|$)/i.test(url)) return {verified:false,method:'DASH sem amostra'};
@@ -501,24 +567,36 @@ async function probe(c,config,request,now,initialPlaylist,startedAt) {
   // Throughput is observed bytes / request + transfer time; never Content-Length / RTT.
   const elapsed=Math.max(1,now()-sampleStart), mbps=bytes*8/elapsed/1000;
   const verified=mbps>=config.minMbps[c.q];
-  return {verified,method:'amostra',mbps,bytes,latencyMs:now()-start,slow:!verified,mediaType:hls?'hls':'direct'};
+  let videoSize;
+  if(!hls){
+    const range=/^bytes\s+(\d+)-(\d+)\/(\d+)$/i.exec(response.headers['content-range']||'');
+    if(response.status===206 && range && Number(range[1])<=Number(range[2]) && Number(range[2])<Number(range[3]))videoSize=positiveBytes(range[3]);
+    else if(response.status===200)videoSize=positiveBytes(response.headers['content-length']);
+  }
+  return {verified,method:'amostra',mbps,bytes,latencyMs:now()-start,slow:!verified,mediaType:hls?'hls':'direct',videoSize};
 }
 function format(c,output,meta) {
   const health=c.health || {verified:false};
   const q=c.q===2160?'4K':c.q ? c.q+'p':'Qualidade desconhecida';
+  const bytes=streamSize(c.raw)||health.videoSize;
+  const fileSize=bytes?sizeLabel(bytes):typeof c.raw.size==='string'?c.raw.size:undefined;
+  const technical=fusionTags(c);
   const tag=health.verified ? health.mbps.toFixed(1)+' Mbps (amostra)' : health.deferred ? 'resolver no Nuvio · sem teste de velocidade' : health.slow ? 'abaixo da velocidade mínima' : c.reportedMbps?c.reportedMbps.toFixed(1)+' Mbps (fonte informa; não verificado)':'velocidade não verificada';
-  const title=[meta.title+' ('+(meta.year||'ano não informado')+') · '+q+' · '+(c.langs.join(', ')||'áudio não informado'),
+  const title=[meta.title+' ('+(meta.year||'ano não informado')+') · '+q+' · Áudio: '+(c.langs.join(', ')||'não informado')+(technical.length?' · '+technical.join(' · '):''),
     (meta.creators||'Diretor/criador não informado')+' · '+(meta.studios||'Estúdio não informado'),
-    'Classificação '+meta.country+': '+(meta.ratings.join(', ')||'não informada')+' · '+tag+' · '+c.source].join('\n');
+    'Classificação '+meta.country+': '+(meta.ratings.join(', ')||'não informada')+' · '+tag+(fileSize?' · '+fileSize:'')+' · '+c.source].join('\n');
   const label=output==='native'?title:'Kazuji '+q+' · '+c.groupLanguage;
   if (output==='stremio') {
     const result=Object.assign({},c.raw,{name:label,title,description:title});
     result.behaviorHints=Object.assign({},c.raw.behaviorHints);
+    const filename=releaseFilename(c.raw);
+    if(filename)result.behaviorHints.filename=filename;
+    if(bytes)result.behaviorHints.videoSize=bytes;
     if(Object.keys(c.headers).length) {result.behaviorHints.proxyHeaders=Object.assign({},result.behaviorHints.proxyHeaders,{request:c.headers});result.behaviorHints.notWebReady=true;}
     return result;
   }
   return {name:label,title,url:c.raw.url,quality:q,provider:c.source,language:c.langs.join(', ')||'Desconhecido',
-    size:typeof c.raw.size==='string'?c.raw.size:undefined,type:health.mediaType || (/\.m3u8(?:[?#]|$)/i.test(c.raw.url)?'hls':'direct'),headers:c.headers,
+    size:fileSize,type:health.mediaType || (/\.m3u8(?:[?#]|$)/i.test(c.raw.url)?'hls':'direct'),headers:c.headers,
     subtitles:(Array.isArray(c.raw.subtitles)?c.raw.subtitles:[]).filter(s=>httpUrl(s.url)).map(s=>({url:s.url,language:s.lang || s.language || 'und',name:s.name,headers:safeHeaders(s.headers)}))};
 }
 module.exports={DEFAULTS,normalizeConfig,createAggregator,quality,audioLanguages,supports,resourceUrl,ratingAllowed,parseInput,resolveHttpUrl};

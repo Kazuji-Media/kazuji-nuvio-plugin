@@ -3,6 +3,8 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kazuji Media · Configuração</title><link rel="stylesheet" href="/style.css"><script defer src="/configure.js"></script></head>
 <body><main>
 <h1>Kazuji Media</h1><p>Escolha as fontes, os idiomas e a quantidade de resultados por qualidade.</p>
+<p>Emblemas Fusion: importe <a href="/badges.json">o pacote Kazuji</a> em Nuvio → Configurações → Streams → URLs de emblemas Fusion. Os metadados disponíveis são preparados automaticamente. Ative também Emblemas de tamanho e Logótipo do addon no Nuvio.</p>
+<label>URL dos emblemas Fusion<input id="fusion-url" readonly></label><button id="copy-fusion" type="button">Copiar URL dos emblemas</button>
 <form id="config">
 <label>URLs dos manifestos Stremio HTTP<textarea name="manifests" required rows="5" placeholder="https://seu-addon/manifest.json"></textarea><small>Separe por vírgula ou linha. Use URLs já configuradas no add-on original.</small></label>
 <fieldset><legend>Qualidades de vídeo</legend><small>Selecione uma ou mais. Os resultados priorizam a maior resolução.</small>

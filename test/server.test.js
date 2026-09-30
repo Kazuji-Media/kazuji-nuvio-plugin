@@ -38,6 +38,7 @@ test('persists opaque config IDs atomically and restores them after restart',asy
   const b=new ConfigStore(dir);await b.load();assert.equal(ids[0].length,48);assert.equal(b.get(ids[0]).manifests[0],'secret1');assert.equal(b.get(ids[1]).manifests[0],'secret2');
 });
 test('end-to-end configured addon works with two local upstreams and no TorBox account',async t=>{
+  assert.equal(require('../src/server').manifest({manifests:[]}).logo,'https://joaovpimenta.github.io/kazuji-media/assets/logo.svg');
   const dir=await fs.mkdtemp(path.join(os.tmpdir(),'kazuji-server-'));t.after(()=>fs.rm(dir,{recursive:true,force:true}));
   let base,videoRequests=0;
   const upstream=http.createServer((req,res)=>{
@@ -48,12 +49,23 @@ test('end-to-end configured addon works with two local upstreams and no TorBox a
   });
   base=await listen(upstream);t.after(()=>close(upstream));
   const request=createNodeTransport({allowPrivate:true,allowHttp:true});
-  const server=await createServer({dataDir:dir,request,quiet:true});const host=await listen(server);t.after(()=>close(server));
+  const server=await createServer({dataDir:dir,request,quiet:true,publicUrl:'https://kazuji.example'});const host=await listen(server);t.after(()=>close(server));
   const save=await fetch(host+'/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({manifests:[base+'/a/manifest.json',base+'/b/manifest.json'],qualities:[1080],settleMs:0})});
   assert.equal(save.status,201);const {manifestPath}=await save.json();
   const manifest=await (await fetch(host+manifestPath)).json();assert.equal(manifest.resources[0].name,'stream');assert.equal(JSON.stringify(manifest).includes(base),false);
+  assert.equal(manifest.logo,'https://kazuji.example/assets/logo.svg');
   const result=await (await fetch(host+manifestPath.replace('manifest.json','stream/movie/tt123.json'))).json();
   assert.equal(result.streams.length,1);assert.match(result.streams[0].name,/1080p/);assert.equal(videoRequests,1);
+  assert.equal(result.streams[0].behaviorHints.videoSize,999999);
+  const badges=await(await fetch(host+'/badges.json')).json();
+  assert.ok(badges.filters.length>=40);
+  for(const badge of badges.filters){
+    const asset=new URL(badge.imageURL);assert.equal(asset.origin,'https://kazuji.example');
+    const icon=await fetch(host+asset.pathname);assert.equal(icon.status,200);assert.match(icon.headers.get('content-type'),/image\/svg\+xml/);
+    assert.match(await icon.text(),/<svg/);
+  }
+  assert.equal((await fetch(host+'/assets/fusion/missing.svg')).status,404);
+  assert.equal((await fetch(host+'/assets/logo.svg')).status,200);
   const invalid=await fetch(host+manifestPath.replace('manifest.json','stream/movie/garbage.json'));assert.equal(invalid.status,400);
   assert.equal((await fetch(host+'/c/'+'a'.repeat(48)+'/manifest.json')).status,404);
   assert.equal((await fetch(host+'/api/config',{method:'POST',body:'{"manifests":["file:///etc/passwd"]}'})).status,400);

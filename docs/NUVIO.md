@@ -68,6 +68,13 @@ No Mobile, a conversão usa `name` (ou `title` se `name` estiver ausente) como r
 - [Conversão e ordenação — StreamFetchSupport.kt](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamFetchSupport.kt)
 - [Renderização — StreamCard.kt](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamCard.kt)
 
+## Metadados Fusion e tamanho
+
+O Kazuji 1.1.4 inclui termos técnicos reconhecíveis no rótulo/descrição dos dois adaptadores. A conversão JS mantém `name` e monta a descrição com quality/size/language; `size` não é convertido em `behaviorHints.videoSize`. O HTTP preserva `behaviorHints`, preenche `filename` somente com um nome real recebido e fornece `videoSize` numérico quando conhecido. O pacote de emblemas precisa ser importado nas configurações globais pelo usuário.
+
+- [Regras e candidatos de correspondência Fusion](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamBadgeRules.kt)
+- [Imagens e emblema de tamanho](https://github.com/NuvioMedia/NuvioMobile/blob/c1065d0a2a717d7dba445257f064f3fb8d1b30a3/composeApp/src/commonMain/kotlin/com/nuvio/app/features/streams/StreamBadgeChip.kt)
+
 ## TorBox conectado ao app
 
 O registro de APIs do plugin JS inclui fetch, URL, crypto, DOM, WASM e funções básicas; **não inclui uma API de TorBox nem de credenciais debrid**.

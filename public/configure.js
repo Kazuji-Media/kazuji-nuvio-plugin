@@ -1,5 +1,9 @@
 'use strict';
 const form=document.getElementById('config'),status=document.getElementById('status');
+const fusionUrl=document.getElementById('fusion-url');fusionUrl.value=new URL('/badges.json',location.origin).href;
+document.getElementById('copy-fusion').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(fusionUrl.value);status.textContent='URL dos emblemas copiada.';}catch(_){fusionUrl.select();status.textContent='Selecione e copie a URL dos emblemas.';}
+});
 form.addEventListener('submit',async event=>{
   event.preventDefault();
   const button=form.querySelector('button');button.disabled=true;status.textContent='Salvando configuração…';

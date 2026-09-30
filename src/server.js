@@ -6,8 +6,9 @@ const {createAggregator,normalizeConfig}=require('./aggregator');
 const {createNodeTransport}=require('./node-transport');
 const {ConfigStore}=require('./config-store');
 const VERSION=require('../package.json').version;
-function manifest(config,id='default'){
+function manifest(config,id='default',publicUrl=''){
   return {id:'org.kazuji.media.'+id.slice(0,12),name:'Kazuji Media',version:VERSION,description:'Fontes por qualidade e idioma, créditos e classificação. Testes por amostra e TorBox opcional via Nuvio.',
+    logo:publicUrl?new URL('/assets/logo.svg',publicUrl).href:'https://joaovpimenta.github.io/kazuji-media/assets/logo.svg',
     resources:[{name:'stream',types:['movie','series'],idPrefixes:['tt','tmdb:']}],types:['movie','series'],catalogs:[],
     behaviorHints:{configurable:true,configurationRequired:!config.manifests.length}};
 }
@@ -40,6 +41,16 @@ async function createServer(options={}) {
       if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}
       if(!allowed(req.socket.remoteAddress,url.pathname==='/api/config'?4:1)){send(429,{error:'Muitas solicitações'});return;}
       if(req.method==='GET'&&url.pathname==='/health'){send(200,{status:'ok',version:VERSION});return;}
+      if(req.method==='GET'&&url.pathname==='/badges.json'){
+        const badges=JSON.parse(await fs.readFile(path.join(__dirname,'../badges.json'),'utf8'));
+        if(publicUrl)for(const filter of badges.filters)filter.imageURL=new URL('/assets/fusion/'+filter.id+'.svg',publicUrl).href;
+        send(200,badges);return;
+      }
+      if(req.method==='GET'&&/^\/assets\/(?:logo\.svg|fusion\/[a-z0-9-]+\.svg)$/.test(url.pathname)){
+        let asset;
+        try{asset=await fs.readFile(path.join(__dirname,'..',url.pathname.slice(1)));}catch(_){send(404,{error:'Emblema não encontrado'});return;}
+        res.writeHead(200,{'Content-Type':'image/svg+xml','Cache-Control':'public, max-age=86400'});res.end(asset);return;
+      }
       if(req.method==='GET'&&['/','/configure'].includes(url.pathname)||req.method==='GET'&&/^\/c\/[a-f0-9]{48}\/configure$/.test(url.pathname)){
         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'"});res.end(await fs.readFile(path.join(__dirname,'../public/index.html')));return;
       }
@@ -63,7 +74,7 @@ async function createServer(options={}) {
       if(req.method!=='GET'||!match){send(404,{error:'Rota não encontrada'});return;}
       const config=match[1]?store.get(match[1]):defaultConfig;
       if(!config){send(404,{error:'Configuração não encontrada'});return;}
-      if(match[2]==='manifest.json'){send(200,manifest(config,match[1]));return;}
+      if(match[2]==='manifest.json'){send(200,manifest(config,match[1],publicUrl||undefined));return;}
       if(active>=32){send(503,{error:'Servidor ocupado',streams:[]});return;}
       let id;
       try{id=decodeURIComponent(match[4]);require('./aggregator').parseInput(id,match[3]);}catch(_){send(400,{error:'ID de mídia inválido',streams:[]});return;}

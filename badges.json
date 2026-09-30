@@ -1,0 +1,734 @@
+{
+  "filters": [
+    {
+      "id": "4k",
+      "groupId": "resolution",
+      "name": "4K",
+      "pattern": "(?i)\\b(?:2160p?|4k|uhd)\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/4k.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF96BFFF"
+    },
+    {
+      "id": "1080p",
+      "groupId": "resolution",
+      "name": "1080p",
+      "pattern": "(?i)\\b1080p?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/1080p.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF96BFFF"
+    },
+    {
+      "id": "720p",
+      "groupId": "resolution",
+      "name": "720p",
+      "pattern": "(?i)\\b720p?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/720p.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF96BFFF"
+    },
+    {
+      "id": "480p",
+      "groupId": "resolution",
+      "name": "480p",
+      "pattern": "(?i)\\b480p?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/480p.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF96BFFF"
+    },
+    {
+      "id": "remux",
+      "groupId": "source",
+      "name": "REMUX",
+      "pattern": "(?i)\\bremux\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/remux.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF99DAB3"
+    },
+    {
+      "id": "bluray",
+      "groupId": "source",
+      "name": "BluRay",
+      "pattern": "(?i)\\bblu[ ._-]?ray\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/bluray.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF99DAB3"
+    },
+    {
+      "id": "web-dl",
+      "groupId": "source",
+      "name": "WEB-DL",
+      "pattern": "(?i)\\bweb[ ._-]?dl\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/web-dl.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF99DAB3"
+    },
+    {
+      "id": "webrip",
+      "groupId": "source",
+      "name": "WEBRip",
+      "pattern": "(?i)\\bwebrip\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/webrip.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF99DAB3"
+    },
+    {
+      "id": "hdcam",
+      "groupId": "source",
+      "name": "HDCAM",
+      "pattern": "(?i)\\bhdcam\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hdcam.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF99DAB3"
+    },
+    {
+      "id": "dvdrip",
+      "groupId": "source",
+      "name": "DVDRip",
+      "pattern": "(?i)\\bdvdrip\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dvdrip.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF99DAB3"
+    },
+    {
+      "id": "hevc",
+      "groupId": "codec",
+      "name": "HEVC",
+      "pattern": "(?i)\\b(?:hevc|h[ ._-]?265|x265)\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hevc.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFB6B0FC"
+    },
+    {
+      "id": "avc",
+      "groupId": "codec",
+      "name": "AVC",
+      "pattern": "(?i)\\b(?:avc|h[ ._-]?264|x264)\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/avc.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFB6B0FC"
+    },
+    {
+      "id": "av1",
+      "groupId": "codec",
+      "name": "AV1",
+      "pattern": "(?i)\\bav1\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/av1.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFB6B0FC"
+    },
+    {
+      "id": "vp9",
+      "groupId": "codec",
+      "name": "VP9",
+      "pattern": "(?i)\\bvp9\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/vp9.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFB6B0FC"
+    },
+    {
+      "id": "dolby-vision",
+      "groupId": "vision",
+      "name": "Dolby Vision",
+      "pattern": "(?i)\\b(?:dolby[ ._-]?vision|dovi)\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dolby-vision.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF5D58D"
+    },
+    {
+      "id": "hdr10-plus",
+      "groupId": "hdr",
+      "name": "HDR10+",
+      "pattern": "(?i)\\bhdr10(?:\\+|plus)",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hdr10-plus.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF5D58D"
+    },
+    {
+      "id": "hdr10",
+      "groupId": "hdr",
+      "name": "HDR10",
+      "pattern": "(?i)\\bhdr10\\b(?!\\+)",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hdr10.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF5D58D"
+    },
+    {
+      "id": "hlg",
+      "groupId": "hdr",
+      "name": "HLG",
+      "pattern": "(?i)\\bhlg\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hlg.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF5D58D"
+    },
+    {
+      "id": "hdr",
+      "groupId": "hdr",
+      "name": "HDR",
+      "pattern": "(?i)\\bhdr\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/hdr.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF5D58D"
+    },
+    {
+      "id": "sdr",
+      "groupId": "hdr",
+      "name": "SDR",
+      "pattern": "(?i)\\bsdr\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/sdr.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF5D58D"
+    },
+    {
+      "id": "atmos",
+      "groupId": "immersive",
+      "name": "Atmos",
+      "pattern": "(?i)\\batmos\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/atmos.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "dts-x",
+      "groupId": "audio",
+      "name": "DTS:X",
+      "pattern": "(?i)\\bdts[ .:_-]?x\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dts-x.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "truehd",
+      "groupId": "audio",
+      "name": "TrueHD",
+      "pattern": "(?i)\\btrue[ ._-]?hd\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/truehd.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "dts-hd-ma",
+      "groupId": "audio",
+      "name": "DTS-HD MA",
+      "pattern": "(?i)\\bdts[ ._-]?hd[ ._-]?ma\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dts-hd-ma.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "dd-plus",
+      "groupId": "audio",
+      "name": "DD+",
+      "pattern": "(?i)\\b(?:dd\\+|ddp|eac3)",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dd-plus.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "dolby-digital",
+      "groupId": "audio",
+      "name": "Dolby Digital",
+      "pattern": "(?i)\\bdolby[ ._-]?digital\\b(?![ ._-]?plus)",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dolby-digital.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "dts",
+      "groupId": "audio",
+      "name": "DTS",
+      "pattern": "(?i)\\bdts\\b(?![ .:_-]?(?:x|hd))",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dts.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "aac",
+      "groupId": "audio",
+      "name": "AAC",
+      "pattern": "(?i)\\baac\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/aac.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "flac",
+      "groupId": "audio",
+      "name": "FLAC",
+      "pattern": "(?i)\\bflac\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/flac.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "pcm",
+      "groupId": "audio",
+      "name": "PCM",
+      "pattern": "(?i)\\bpcm\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/pcm.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "mp3",
+      "groupId": "audio",
+      "name": "MP3",
+      "pattern": "(?i)\\bmp3\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/mp3.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "7-1",
+      "groupId": "channels",
+      "name": "7.1",
+      "pattern": "(?i)\\b7\\.1\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/7-1.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFBBD0D8"
+    },
+    {
+      "id": "6-1",
+      "groupId": "channels",
+      "name": "6.1",
+      "pattern": "(?i)\\b6\\.1\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/6-1.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFBBD0D8"
+    },
+    {
+      "id": "5-1",
+      "groupId": "channels",
+      "name": "5.1",
+      "pattern": "(?i)\\b5\\.1\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/5-1.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFBBD0D8"
+    },
+    {
+      "id": "2-0",
+      "groupId": "channels",
+      "name": "2.0",
+      "pattern": "(?i)\\b2\\.0\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/2-0.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFBBD0D8"
+    },
+    {
+      "id": "1-0",
+      "groupId": "channels",
+      "name": "1.0",
+      "pattern": "(?i)\\b1\\.0\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/1-0.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFBBD0D8"
+    },
+    {
+      "id": "imax",
+      "groupId": "imax",
+      "name": "IMAX",
+      "pattern": "(?i)\\bimax\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/imax.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFCFBBA3"
+    },
+    {
+      "id": "extended",
+      "groupId": "extended",
+      "name": "EXTENDED",
+      "pattern": "(?i)\\bextended\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/extended.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFCFBBA3"
+    },
+    {
+      "id": "director-s-cut",
+      "groupId": "director-s-cut",
+      "name": "Director's Cut",
+      "pattern": "(?i)\\bdirector'?s[ ._-]?cut\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/director-s-cut.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFCFBBA3"
+    },
+    {
+      "id": "proper",
+      "groupId": "proper",
+      "name": "PROPER",
+      "pattern": "(?i)\\bproper\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/proper.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFCFBBA3"
+    },
+    {
+      "id": "repack",
+      "groupId": "repack",
+      "name": "REPACK",
+      "pattern": "(?i)\\brepack\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/repack.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFCFBBA3"
+    },
+    {
+      "id": "10bit",
+      "groupId": "depth",
+      "name": "10bit",
+      "pattern": "(?i)\\b10bit\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/10bit.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFB6B0FC"
+    },
+    {
+      "id": "12bit",
+      "groupId": "depth",
+      "name": "12bit",
+      "pattern": "(?i)\\b12bit\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/12bit.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFB6B0FC"
+    },
+    {
+      "id": "pt-br",
+      "groupId": "language",
+      "name": "PT-BR",
+      "pattern": "(?i)\\bpt[ ._-]?br\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/pt-br.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF99DAB3"
+    },
+    {
+      "id": "multi-audio",
+      "groupId": "multi",
+      "name": "MULTI AUDIO",
+      "pattern": "(?i)\\bmulti[ ._-]?audio\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/multi-audio.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FF99DAB3"
+    },
+    {
+      "id": "dts-hd",
+      "groupId": "audio",
+      "name": "DTS-HD",
+      "pattern": "(?i)\\bdts[ ._-]?hd\\b(?![ ._-]?ma)",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/dts-hd.svg",
+      "isEnabled": true,
+      "tagStyle": "none",
+      "tagColor": "#FF191C22",
+      "textColor": "#FFF0B5C9"
+    },
+    {
+      "id": "audio-en",
+      "groupId": "audio-en",
+      "name": "EN",
+      "pattern": "(?i)(?:Áudio:\\s*|,\\s*)en(?:-[a-z]{2})?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-en.svg",
+      "isEnabled": true,
+      "tagStyle": "none"
+    },
+    {
+      "id": "audio-ja",
+      "groupId": "audio-ja",
+      "name": "JA",
+      "pattern": "(?i)(?:Áudio:\\s*|,\\s*)ja(?:-[a-z]{2})?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-ja.svg",
+      "isEnabled": true,
+      "tagStyle": "none"
+    },
+    {
+      "id": "audio-es",
+      "groupId": "audio-es",
+      "name": "ES",
+      "pattern": "(?i)(?:Áudio:\\s*|,\\s*)es(?:-[a-z]{2})?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-es.svg",
+      "isEnabled": true,
+      "tagStyle": "none"
+    },
+    {
+      "id": "audio-fr",
+      "groupId": "audio-fr",
+      "name": "FR",
+      "pattern": "(?i)(?:Áudio:\\s*|,\\s*)fr(?:-[a-z]{2})?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-fr.svg",
+      "isEnabled": true,
+      "tagStyle": "none"
+    },
+    {
+      "id": "audio-de",
+      "groupId": "audio-de",
+      "name": "DE",
+      "pattern": "(?i)(?:Áudio:\\s*|,\\s*)de(?:-[a-z]{2})?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-de.svg",
+      "isEnabled": true,
+      "tagStyle": "none"
+    },
+    {
+      "id": "audio-it",
+      "groupId": "audio-it",
+      "name": "IT",
+      "pattern": "(?i)(?:Áudio:\\s*|,\\s*)it(?:-[a-z]{2})?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-it.svg",
+      "isEnabled": true,
+      "tagStyle": "none"
+    },
+    {
+      "id": "audio-ru",
+      "groupId": "audio-ru",
+      "name": "RU",
+      "pattern": "(?i)(?:Áudio:\\s*|,\\s*)ru(?:-[a-z]{2})?\\b",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-ru.svg",
+      "isEnabled": true,
+      "tagStyle": "none"
+    },
+    {
+      "id": "audio-pt",
+      "groupId": "audio-pt",
+      "name": "PT",
+      "pattern": "(?i)(?:Áudio:\\s*|,\\s*)pt\\b(?!-BR)",
+      "imageURL": "https://joaovpimenta.github.io/kazuji-media/assets/fusion/audio-pt.svg",
+      "isEnabled": true,
+      "tagStyle": "none"
+    }
+  ],
+  "groups": [
+    {
+      "id": "resolution",
+      "name": "Resolução",
+      "color": "#FF96BFFF",
+      "isExpanded": true
+    },
+    {
+      "id": "source",
+      "name": "Fonte",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "codec",
+      "name": "Codec",
+      "color": "#FFB6B0FC",
+      "isExpanded": true
+    },
+    {
+      "id": "hdr",
+      "name": "Faixa dinâmica",
+      "color": "#FFF5D58D",
+      "isExpanded": true
+    },
+    {
+      "id": "audio",
+      "name": "Áudio",
+      "color": "#FFF0B5C9",
+      "isExpanded": true
+    },
+    {
+      "id": "channels",
+      "name": "Canais",
+      "color": "#FFBBD0D8",
+      "isExpanded": true
+    },
+    {
+      "id": "edition",
+      "name": "Edição",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "depth",
+      "name": "Profundidade",
+      "color": "#FFB6B0FC",
+      "isExpanded": true
+    },
+    {
+      "id": "language",
+      "name": "Idiomas",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "immersive",
+      "name": "Áudio imersivo",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "vision",
+      "name": "Dolby Vision",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "multi",
+      "name": "Áudio múltiplo",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "imax",
+      "name": "IMAX",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "extended",
+      "name": "Extended",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "director-s-cut",
+      "name": "Director’s Cut",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "proper",
+      "name": "Proper",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "repack",
+      "name": "Repack",
+      "color": "#FFCFBBA3",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-en",
+      "name": "Áudio EN",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-ja",
+      "name": "Áudio JA",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-es",
+      "name": "Áudio ES",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-fr",
+      "name": "Áudio FR",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-de",
+      "name": "Áudio DE",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-it",
+      "name": "Áudio IT",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-ru",
+      "name": "Áudio RU",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    },
+    {
+      "id": "audio-pt",
+      "name": "Áudio PT",
+      "color": "#FF99DAB3",
+      "isExpanded": true
+    }
+  ]
+}

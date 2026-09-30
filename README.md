@@ -34,12 +34,28 @@ O Nuvio não injeta o idioma do aparelho no plugin: configure-o manualmente, com
 O rótulo nativo (`name`) contém três linhas; `title` repete o conteúdo para consumidores que o utilizam:
 
 ```text
-Nome da obra (2024) · 4K · pt-BR
+Nome da obra (2024) · 4K · Áudio: pt-BR · WEB-DL · HEVC · HDR10+ · DD+ · 5.1
 Diretor/criador · Estúdio
-Classificação BR: 12 · 35.2 Mbps (fonte informa; não verificado) · Nome da fonte
+Classificação BR: 12 · 35.2 Mbps (fonte informa; não verificado) · 4.5 GB · Nome da fonte
 ```
 
 Título/ano, direção (filmes), criadores (séries), produtoras e certificações vêm do TMDB. Séries mostram o ano de estreia e a classificação da série. Campos ausentes aparecem como “não informado”; classificação de outro país não substitui silenciosamente a do país escolhido. No add-on HTTP, o nome do grupo identifica qualidade/idioma e `title` contém as três linhas. A disposição/truncamento final depende da versão do aplicativo.
+
+### Emblemas Fusion (padrão automático)
+
+A partir da 1.1.4, o Kazuji prepara os termos de resolução, fonte (REMUX/BluRay/WEB-DL/WEBRip), codec, HDR/Dolby Vision, áudio, canais, edição e profundidade de cor automaticamente. Usa o nome original do arquivo, campos declarados e metadados `clientResolve` disponíveis. Não exige nova configuração nem consultas extras; mantém os filtros e preferências existentes. Informações desconhecidas são omitidas: sucesso na reprodução não comprova HEVC, HDR, Atmos ou áudio dublado. Legendas e idioma original do TMDB não viram emblemas de áudio.
+
+Em **Nuvio → Configurações → Streams → URLs de emblemas Fusion**, importe uma vez:
+
+```text
+https://joaovpimenta.github.io/kazuji-media/badges.json
+```
+
+O pacote inclui SVGs próprios e regras de qualidade, fonte, codec, HDR, áudio, canais, edição e idiomas. Os metadados também funcionam com outros pacotes cujas regras reconheçam esses termos. No servidor HTTP, a página `/configure` permite copiar a URL `/badges.json` da própria instância; configure `PUBLIC_URL` para os SVGs usarem esse host. Sem `PUBLIC_URL`, os SVGs usam GitHub Pages. O plugin não altera as configurações globais do Nuvio nem importa o pacote pelo usuário.
+
+Ative **Emblemas de tamanho** e **Logótipo do addon** no Nuvio. O add-on HTTP mantém o nome real do arquivo em `behaviorHints.filename` e o tamanho em bytes em `behaviorHints.videoSize`. Prioriza os metadados da fonte; aceita tamanhos declarados com unidades SI/IEC e, quando houver teste HTTP, o total válido de `Content-Range` ou `Content-Length` de uma resposta completa. O tamanho de uma amostra parcial ou segmento HLS não vira tamanho total. No plugin JS, o tamanho conhecido aparece em texto e no campo `size`, pois o conversor atual do app não oferece o emblema nativo de tamanho para plugins. O logotipo é declarado nos dois manifestos.
+
+O preparo Fusion não inicia testes de vídeo no plugin JS. A posição dos emblemas e a ativação do pacote continuam sendo opções do Nuvio.
 
 ### Testes de fonte no add-on HTTP
 

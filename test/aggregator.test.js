@@ -27,6 +27,59 @@ function setup({streams={},delays={},errors={},meta={},output='native',key='test
 }
 function stream(q,url='https://video.example/'+q+'.mp4',extra={}){return Object.assign({url,title:'Example '+q+'p PT-BR'},extra);}
 
+function matchedFusionNames(row){
+  const pack=require('../badges.json');
+  const text=[row.name,row.title,row.description,row.behaviorHints && row.behaviorHints.filename].filter(Boolean).join(' ');
+  return pack.filters.filter(f=>new RegExp(f.pattern.replace(/^\(\?i\)/,''),'i').test(text)).map(f=>f.name);
+}
+test('Fusion defaults preserve technical metadata and match the bundled badges in native and HTTP output',async()=>{
+  for(const output of ['native','stremio']){
+    const filename='Movie.2160p.WEB-DL.x265.HDR10+.DDP5.1.Atmos.IMAX.10bit.mkv';
+    const hints={filename,videoSize:4500000000,bingeGroup:'keep',videoHash:'hash'};
+    const s=setup({output,streams:{'a.example':[stream(2160,undefined,{audioLanguages:['pt-BR','en'],behaviorHints:hints})]},config:{probeMode:'off',allowUnverified:true}});
+    const row=(await s.run()).streams[0];
+    const badges=matchedFusionNames(row);
+    for(const name of ['4K','WEB-DL','HEVC','HDR10+','DD+','5.1','Atmos','IMAX','10bit','PT-BR','MULTI AUDIO'])assert.ok(badges.includes(name),output+': '+name);
+    assert.equal(badges.includes('HDR10'),false);assert.equal(badges.includes('Dolby Digital'),false);
+    assert.match(row.title,/4.5 GB/);
+    if(output==='native'){assert.equal(row.size,'4.5 GB');assert.equal(row.name,row.title);}
+    else {assert.deepEqual(row.behaviorHints,hints);assert.equal(row.description,row.title);}
+    assert.deepEqual(hints,{filename,videoSize:4500000000,bingeGroup:'keep',videoHash:'hash'});
+  }
+});
+test('Fusion uses clientResolve parsed metadata and an actual filename without inventing HDR or channels',async()=>{
+  const s=setup({output:'stremio',streams:{'a.example':[{url:'https://video.example/film',clientResolve:{stream:{raw:{filename:'Movie.mkv',parsed:{resolution:'1080p',quality:'BluRay',codec:'h264',audio:['AAC'],languages:['pt-BR']}}}}}]},config:{probeMode:'off',allowUnverified:true}});
+  const row=(await s.run()).streams[0],badges=matchedFusionNames(row);
+  assert.equal(row.behaviorHints.filename,'Movie.mkv');
+  for(const name of ['1080p','BluRay','AVC','AAC','PT-BR'])assert.ok(badges.includes(name),name);
+  assert.equal(badges.some(x=>/HDR|SDR|Atmos|5\.1|Dolby Vision/.test(x)),false);
+  assert.equal(row.behaviorHints.videoSize,undefined);
+});
+test('unknown metadata remains unknown even with HDR-capable titles, subtitles and speed declarations',async()=>{
+  const s=setup({streams:{'a.example':[stream(1080,undefined,{title:'1080p',subtitles:[{url:'https://subs.example/pt.vtt',language:'pt-BR'}],speedMbps:35.1,size:-1})]},config:{probeMode:'off',allowUnverified:true}});
+  const row=(await s.run()).streams[0];assert.deepEqual(matchedFusionNames(row),['1080p']);
+  assert.equal(row.size,undefined);assert.equal(row.language,'Desconhecido');
+});
+test('formatted sizes use explicit decimal/binary units and partial response length never becomes file size',async()=>{
+  for(const [size,expected]of [['4.5 GB',4500000000],['4,5 GiB',4831838208],[4500000000,4500000000]]){
+    const s=setup({output:'stremio',streams:{'a.example':[stream(1080,undefined,{size})]},config:{probeMode:'off',allowUnverified:true}});
+    assert.equal((await s.run()).streams[0].behaviorHints.videoSize,expected);
+  }
+  for(const [range,expected]of [['bytes 0-262143/9000000000',9000000000],['bytes 0-262143/*',undefined],['bytes 0-262143/100',undefined]]){
+    const s=setup({output:'stremio',streams:{'a.example':[stream(1080)]},probe:async url=>{
+      await delay(3);return {...response(new Uint8Array(262144),{'content-type':'video/mp4','content-length':'262144','content-range':range},url),status:206};
+    }});
+    assert.equal((await s.run()).streams[0].behaviorHints.videoSize,expected);
+  }
+});
+test('HLS segment size is never used as total video size',async()=>{
+  const s=setup({output:'stremio',streams:{'a.example':[stream(1080,'https://video.example/play.m3u8')]},probe:async url=>{
+    if(url.endsWith('.m3u8'))return {status:200,url,text:'#EXTM3U\n#EXTINF:10\nsegment.ts',headers:{},truncated:false};
+    await delay(3);return {...response(new Uint8Array(262144),{'content-type':'video/mp2t','content-range':'bytes 0-262143/500000','content-length':'262144'},url),status:206};
+  }});
+  assert.equal((await s.run()).streams[0].behaviorHints.videoSize,undefined);
+});
+
 test('normalizes settings, limits and JSON lists',()=>{
   const c=normalizeConfig({manifests:'["https://x.example/config/manifest.json?token=abc"]',qualities:'4k,1080p,720',totalTimeoutMs:99999,sourceConcurrency:0});
   assert.deepEqual(c.qualities,[2160,1080,720]);assert.equal(c.totalTimeoutMs,20000);assert.equal(c.sourceConcurrency,1);

@@ -82,6 +82,7 @@ function onSettings() {
   const selected=baseQualities(Object.assign({},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{}));
   return [
     {type:'header',label:'Kazuji · Agregador'},
+    {type:'info',label:'Emblemas Fusion preparados automaticamente. Importe https://joaovpimenta.github.io/kazuji-media/badges.json em Nuvio → Configurações → Streams → URLs de emblemas Fusion. No plugin JS, o tamanho conhecido aparece como texto; o emblema de tamanho precisa do add-on HTTP.'},
     {type:'info',label:typeof setTimeout==='function' && typeof clearTimeout==='function'
       ? 'Requer Nuvio Mobile Full 0.5.4-beta ou runtime compatível. Consulta manifestos e metadados em paralelo, sem testar ou baixar vídeos. Ordena por qualidade, idioma e velocidade informada pela fonte, quando disponível. A reprodução confirma a disponibilidade do link.'
       : 'Este runtime não oferece os timers exigidos. No Mobile, atualize para Nuvio Full 0.5.4-beta ou runtime compatível. No TV, use o add-on HTTP Kazuji.'},
