@@ -273,3 +273,24 @@ test('an English original is second to configured regional audio without inventi
   const result=await s.run();assert.deepEqual(result.streams.map(x=>x.language),['pt-BR','en','ja']);
   assert.equal(normalizeConfig({languages:''}).languages[0],'pt-BR');
 });
+
+test('preserves internal commas in configured manifest paths and queries while splitting actual URLs',()=>{
+  const first='https://torrentio.strem.fun/language=portuguese|qualityfilter=threed,480p,scr,cam,unknown|limit=4|torbox=TEST_ONLY/manifest.json';
+  const second='https://b.example/config;a,b/manifest.json?languages=pt,en';
+  for(const input of [first,[first],JSON.stringify([first])]){
+    assert.deepEqual(normalizeConfig({manifests:input}).manifests,[first]);
+  }
+  for(const separator of [',',', ', '; ', '\n','\r\n']){
+    assert.deepEqual(normalizeConfig({manifests:first+separator+second}).manifests,[first,second]);
+  }
+  assert.equal(resourceUrl(first,'movie','tt123'),first.replace('manifest.json','stream/movie/tt123.json'));
+  assert.equal(resourceUrl(second,'series','tt123:1:2'),second.replace('manifest.json','stream/series/tt123%3A1%3A2.json'));
+  assert.deepEqual(normalizeConfig({qualities:'4k,1080p',languages:'pt-BR,en',allowedRatings:'L,12'}).qualities,[2160,1080]);
+});
+test('queries a raw configured Torrentio-style manifest without splitting its qualityfilter',async()=>{
+  const url='https://torrentio.strem.fun/qualityfilter=threed,480p,scr,cam,unknown|torbox=TEST_ONLY/manifest.json';
+  const s=setup({streams:{'torrentio.strem.fun':[stream(1080)]},config:{manifests:url}});
+  const result=await s.run();assert.equal(result.streams.length,1);
+  assert.ok(s.calls.some(x=>x.url===url));
+  assert.ok(s.calls.some(x=>x.url===url.replace('manifest.json','stream/movie/tt123.json')));
+});

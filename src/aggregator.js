@@ -23,6 +23,12 @@ function list(value) {
   }
   return value.split(/[\n,;]+/).map(x => x.trim()).filter(Boolean);
 }
+function manifestList(value) {
+  if(typeof value!=='string' || value.trim().startsWith('['))return list(value);
+  // Commas/semicolons are legal inside configured addon URLs (e.g. Torrentio
+  // qualityfilter). Only split them when the next item starts a new HTTP URL.
+  return value.split(/[\r\n]+|[,;](?=\s*https?:\/\/)/i).map(x=>x.trim()).filter(Boolean);
+}
 function number(value, fallback, min, max) {
   const n = value === '' || value == null ? NaN : Number(value);
   return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.floor(n))) : fallback;
@@ -62,7 +68,7 @@ function resolveHttpUrl(raw,base) {
 function normalizeConfig(input) {
   input = input || {};
   const config = Object.assign({}, DEFAULTS, input);
-  config.manifests = [...new Set(list(input.manifests).map(raw => {
+  config.manifests = [...new Set(manifestList(input.manifests).map(raw => {
     const url = parseHttpUrl(raw);
     if (!url.pathname.endsWith('/manifest.json')) url.pathname = url.pathname.replace(/\/$/, '') + '/manifest.json';
     return url.origin+url.pathname+url.search;
