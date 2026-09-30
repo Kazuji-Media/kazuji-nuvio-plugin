@@ -1,13 +1,13 @@
 {
   "name": "Kazuji Media",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Fontes embutidas, TorBox e fornecedores separados por qualidade.",
   "author": "joaovpimenta",
   "scrapers": [
     {
       "id": "kazuji-4k",
       "name": "4K",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "filename": "qualities/4k/provider.js",
       "supportedTypes": [
         "movie",
@@ -15,14 +15,14 @@
       ],
       "enabled": true,
       "hasSettings": true,
-      "description": "Fontes embutidas · 4K. Links HTTP e TorBox em cache com sua API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
+      "description": "Fontes automáticas · 4K. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
       "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
     },
     {
       "id": "kazuji-full-hd",
       "name": "Full HD",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "filename": "qualities/full-hd/provider.js",
       "supportedTypes": [
         "movie",
@@ -30,14 +30,14 @@
       ],
       "enabled": true,
       "hasSettings": true,
-      "description": "Fontes embutidas · Full HD. Links HTTP e TorBox em cache com sua API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
+      "description": "Fontes automáticas · Full HD. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
       "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
     },
     {
       "id": "kazuji-hd",
       "name": "HD",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "filename": "qualities/hd/provider.js",
       "supportedTypes": [
         "movie",
@@ -45,14 +45,14 @@
       ],
       "enabled": true,
       "hasSettings": true,
-      "description": "Fontes embutidas · HD. Links HTTP e TorBox em cache com sua API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
+      "description": "Fontes automáticas · HD. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
       "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
     },
     {
       "id": "kazuji-sd",
       "name": "SD",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "filename": "qualities/sd/provider.js",
       "supportedTypes": [
         "movie",
@@ -60,14 +60,14 @@
       ],
       "enabled": true,
       "hasSettings": true,
-      "description": "Fontes embutidas · SD. Links HTTP e TorBox em cache com sua API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
+      "description": "Fontes automáticas · SD. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
       "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
     },
     {
       "id": "kazuji-unknown",
       "name": "Qualidade desconhecida",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "filename": "qualities/unknown/provider.js",
       "supportedTypes": [
         "movie",
@@ -75,7 +75,7 @@
       ],
       "enabled": false,
       "hasSettings": true,
-      "description": "Fontes embutidas · Qualidade desconhecida. Links HTTP e TorBox em cache com sua API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
+      "description": "Fontes automáticas · Qualidade desconhecida. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
       "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
     }

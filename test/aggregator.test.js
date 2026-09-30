@@ -392,12 +392,14 @@ test('queries a raw configured Torrentio-style manifest without splitting its qu
   assert.ok(s.calls.some(x=>x.url===url.replace('manifest.json','stream/movie/tt123.json')));
 });
 
-test('native direct HTTP survives a stalled optional debrid resolver and HTTP torrent files are not video',async()=>{
+test('native HTTP discards torrents and error schemes',async()=>{
   const request=async(url)=>url.endsWith('manifest.json')?response(manifest):response({streams:[
     {url:'https://media.example/video.mp4',quality:1080},
     {url:'https://media.example/pack.torrent',quality:1080,infoHash:'a'.repeat(40)},
+    {url:'about:error',quality:1080},
+    {url:'magnet:?xt=urn:btih:'+'a'.repeat(40),quality:1080},
   ]});
-  const engine=createAggregator({request,resolveStreams:()=>new Promise(()=>{})});
+  const engine=createAggregator({request});
   const result=await engine.aggregate({id:'tt123',type:'movie'},{manifests:['https://source.example/manifest.json'],qualities:[1080],probeMode:'off',allowUnverified:true,settleMs:0,totalTimeoutMs:500});
   assert.equal(result.streams.length,1);assert.equal(result.streams[0].url,'https://media.example/video.mp4');
   assert.equal(result.stats.candidates,1);
