@@ -46,6 +46,17 @@ test('derived Fusion pack preserves reference artwork and colors with enabled re
   }
   assert.equal(base.filters.filter(f=>!f.isEnabled).length,3);
 });
+test('polished complements reuse collection icons and version font-independent vector artwork',()=>{
+  const fs=require('node:fs'),path=require('node:path'),pack=require('../badges.json');
+  for(const name of ['WEB-DL','SDR','6.1'])assert.ok(pack.filters.find(f=>f.name===name).imageURL.startsWith('https://raw.githubusercontent.com/'));
+  const local=pack.filters.filter(f=>f.imageURL.startsWith('https://joaovpimenta.github.io/kazuji-media/'));
+  assert.equal(local.length,31);
+  for(const filter of local){
+    const asset=new URL(filter.imageURL).pathname.split('/').pop();assert.match(asset,/-v2\.svg$/);
+    const svg=fs.readFileSync(path.join(__dirname,'../assets/fusion',asset),'utf8');
+    assert.doesNotMatch(svg,/<text\b|font-family/);assert.match(svg,/height="80"/);assert.match(svg,/<path\b/);
+  }
+});
 test('derived Fusion rules recognize multiline labels and preserve Atmos/codec and DV/HDR10 pairs',async()=>{
   const s=setup({streams:{'a.example':[stream(2160,undefined,{behaviorHints:{filename:'Movie.2160p.BluRay.Remux.DV.HDR10.TrueHD.Atmos.7.1.mkv'}})]},config:{probeMode:'off',allowUnverified:true}});
   const row=(await s.run()).streams[0],badges=matchedFusionNames(row);
