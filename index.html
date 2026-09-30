@@ -1,8 +1,11 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kazuji Media</title></head>
 <body><main><h1>Kazuji Media</h1><p>Agregador de add-ons HTTP para Nuvio.</p>
-<p>Para Nuvio Mobile Full com runtime assíncrono, adicione a URL do <a href="./manifest.json">manifesto do plugin</a> em Plugins e configure as fontes nas opções do Kazuji.</p>
-<p>Para NuvioTV ou TorBox conectado ao Nuvio, use o servidor HTTP. GitHub Pages não executa esse servidor.</p>
+<p>Para Nuvio Mobile Full com runtime assíncrono, adicione o <a href="./manifest.json">manifesto completo</a> em Plugins. Ele instala fornecedores por qualidade com fontes embutidas. Nas configurações de cada fornecedor, preencha <strong>TorBox · API key</strong> para devolver links HTTP de arquivos em cache. Não exige servidor Kazuji.</p>
+<p>Você também pode instalar um fornecedor individual:</p>
+<ul><li><a href="./qualities/4k/manifest.json">4K · 2160p</a></li><li><a href="./qualities/full-hd/manifest.json">Full HD · 1080p</a></li><li><a href="./qualities/hd/manifest.json">HD · 720p</a></li><li><a href="./qualities/sd/manifest.json">SD · 480p</a></li><li><a href="./qualities/unknown/manifest.json">Qualidade desconhecida</a> (desativado por padrão)</li></ul>
+<p>Escolha o manifesto completo ou os individuais para evitar fornecedores duplicados. As configurações são individuais; fontes que exigem login próprio precisam do manifesto gerado por elas.</p>
+<p>Para NuvioTV com runtime bloqueante, use o servidor HTTP. GitHub Pages não executa esse servidor. <a href="./legacy/manifest.json">Manifesto legado com um único fornecedor</a>.</p>
 <h2>Emblemas Fusion</h2><p>Os resultados já incluem os metadados disponíveis para emblemas. Em Nuvio → Configurações → Streams → URLs de emblemas Fusion, importe <a href="./badges.json">o pacote Kazuji</a>: <code>https://joaovpimenta.github.io/kazuji-media/badges.json</code>.</p>
 <p>O pacote inclui resolução, fonte, codec, HDR, áudio, canais e edição. Ative Emblemas de tamanho e Logótipo do addon no Nuvio. O emblema de tamanho precisa do add-on HTTP; no plugin JS o tamanho aparece como texto quando conhecido.</p>
 <p><a href="https://github.com/joaovpimenta/kazuji-media#readme">Instalação e documentação</a></p></main></body></html>

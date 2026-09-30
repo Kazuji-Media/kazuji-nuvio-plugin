@@ -1,6 +1,7 @@
 'use strict';
 // Appended to aggregator.js by scripts/build.js; no external require at runtime.
 const KazujiCore = module.exports;
+const QUALITY_PROFILE = typeof KAZUJI_QUALITY_PROFILE==='undefined'?null:KAZUJI_QUALITY_PROFILE;
 const QUALITY_OPTIONS = [[2160,'4K'],[1080,'1080p'],[720,'720p'],[480,'480p'],[0,'Qualidade desconhecida']];
 
 function baseQualities(settings) {
@@ -25,7 +26,7 @@ function nativeTransport(maxConcurrent) {
       await new Promise((resolve,reject)=>{waiting.push({resolve,reject,signal});drain();});
       try {
         if(signal && signal.aborted)throw new Error('Cancelado');
-        const response=await fetch(url,{method:options.method||'GET',headers:options.headers||{},signal});
+        const response=await fetch(url,{method:options.method||'GET',headers:options.headers||{},body:options.body,signal});
         const headers={};
         for(const key of ['content-type','content-range','content-length','accept-ranges','location']) headers[key]=response.headers.get(key)||'';
         const bytes=new Uint8Array(await response.arrayBuffer());
@@ -51,8 +52,8 @@ async function getStreams(tmdbId,mediaType,season,episode) {
     console.warn('[Kazuji] Runtime sem timers assíncronos. No Mobile, atualize para Full 0.5.4-beta ou runtime compatível. No TV, use a versão HTTP.');
     return [];
   }
-  const settings=Object.assign({},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{});
-  if(QUALITY_OPTIONS.some(([q])=>settings['quality'+q]!=null)){
+  const settings=Object.assign({},QUALITY_PROFILE?{resultMode:'all',maxCandidates:96}:{},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{});
+  if(!QUALITY_PROFILE && QUALITY_OPTIONS.some(([q])=>settings['quality'+q]!=null)){
     const previous=baseQualities(settings);
     settings.qualities=QUALITY_OPTIONS.filter(([q])=>{
       const value=settings['quality'+q];
@@ -69,8 +70,18 @@ async function getStreams(tmdbId,mediaType,season,episode) {
   // re-enable sampling/HEAD or suppress all links as unverified.
   settings.probeMode='off';
   settings.allowUnverified=true;
-  const config=KazujiCore.normalizeConfig(settings);
-  const engine=KazujiCore.createAggregator({request:nativeTransport(config.sourceConcurrency+1),output:'native',tmdbApiKey:globalThis.TMDB_API_KEY||''});
+  const torboxApiKey=String(settings.torboxApiKey||'').trim();
+  if(torboxApiKey){
+    if(settings.totalTimeoutMs==null || settings.totalTimeoutMs==='')settings.totalTimeoutMs=12000;
+    if(settings.settleMs==null || settings.settleMs==='')settings.settleMs=2500;
+  }
+  // A quality supplier cannot be widened by stale toggles or advanced settings.
+  if(QUALITY_PROFILE)settings.qualities=[QUALITY_PROFILE.quality];
+  const config=KazujiCore.normalizeConfig(KazujiCatalog.applySources(settings,KazujiCore.normalizeConfig));
+  const resolveStreams=torboxApiKey?KazujiTorBox.createResolver({apiKey:torboxApiKey,quality:KazujiCore.quality,
+    eligible:(stream,current)=>!!KazujiCore.candidate(stream,'TorBox',{...current,torrentMode:'native'},'stremio'),
+    maxResolutions:settings.torboxMaxResolutions,warn:message=>console.warn('[Kazuji] '+message)}):null;
+  const engine=KazujiCore.createAggregator({request:nativeTransport(config.sourceConcurrency+1),output:'native',tmdbApiKey:globalThis.TMDB_API_KEY||'',resolveStreams});
   const result=await engine.aggregate({id:String(tmdbId),type:mediaType,season,episode},config);
   console.info('[Kazuji] '+JSON.stringify(result.stats));
   return result.streams;
@@ -79,18 +90,22 @@ async function getStreams(tmdbId,mediaType,season,episode) {
 function onSettings() {
   function select(key,label,values,defaultValue,description){return{type:'select',key,label,description,defaultValue,options:values.map(x=>({label:x[0],value:x[1]}))};}
   function text(key,label,placeholder,description){return{type:'text',key,label,placeholder,description};}
-  const selected=baseQualities(Object.assign({},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{}));
+  const selected=QUALITY_PROFILE?[QUALITY_PROFILE.quality]:baseQualities(Object.assign({},globalThis.KAZUJI_DEFAULT_CONFIG||{},globalThis.SCRAPER_SETTINGS||{}));
   return [
-    {type:'header',label:'Kazuji · Agregador'},
+    {type:'header',label:QUALITY_PROFILE?'Kazuji · '+QUALITY_PROFILE.name:'Kazuji · Agregador'},
+    ...(QUALITY_PROFILE?[{type:'info',label:'Este fornecedor retorna somente '+QUALITY_PROFILE.name+'. As fontes já estão embutidas. Preencha a chave TorBox abaixo para resolver hashes em cache. Não exige servidor Kazuji.'}]:[]),
+    text('torboxApiKey','TorBox · API key','','Chave da sua conta TorBox. Consulta cache e devolve links HTTP de vídeo. É salva pelo Nuvio nas configurações deste fornecedor, não publicada no GitHub. O formulário do app usa campo de texto.'),
+    text('torboxMaxResolutions','TorBox · máximo de torrents em cache por busca','4','Padrão 4, máximo 12, por fornecedor. Só registra itens já em cache; não inicia downloads de torrents sem cache.'),
     {type:'info',label:'Emblemas Fusion preparados automaticamente. Importe https://joaovpimenta.github.io/kazuji-media/badges.json em Nuvio → Configurações → Streams → URLs de emblemas Fusion. No plugin JS, o tamanho conhecido aparece como texto; o emblema de tamanho precisa do add-on HTTP.'},
     {type:'info',label:typeof setTimeout==='function' && typeof clearTimeout==='function'
       ? 'Requer Nuvio Mobile Full 0.5.4-beta ou runtime compatível. Consulta manifestos e metadados em paralelo, sem testar ou baixar vídeos. Ordena por qualidade, idioma e velocidade informada pela fonte, quando disponível. A reprodução confirma a disponibilidade do link.'
       : 'Este runtime não oferece os timers exigidos. No Mobile, atualize para Nuvio Full 0.5.4-beta ou runtime compatível. No TV, use o add-on HTTP Kazuji.'},
-    text('manifests','Manifestos Stremio HTTP','https://addon.exemplo/manifest.json','Separe URLs por vírgula, ou use um array JSON. Inclua a configuração do próprio add-on na URL. Não aceita repositórios de plugins JavaScript.'),
-    {type:'header',label:'Qualidades de vídeo · selecione uma ou mais'},
-    ...QUALITY_OPTIONS.map(([q,label])=>({type:'toggle',key:'quality'+q,label,defaultValue:selected.includes(q)})),
+    {type:'toggle',key:'useBuiltInSources',label:'Usar catálogo de fontes embutidas',defaultValue:true},
+    text('manifests','Manifestos adicionais / TorBox','https://addon.exemplo/configuracao/manifest.json','Separe URLs por vírgula, ou use um array JSON. Use o manifesto gerado com TorBox no add-on original. Soma às fontes embutidas; URLs repetidas são consultadas uma vez. Configurações são individuais por fornecedor.'),
+    ...(!QUALITY_PROFILE?[{type:'header',label:'Qualidades de vídeo · selecione uma ou mais'},
+      ...QUALITY_OPTIONS.map(([q,label])=>({type:'toggle',key:'quality'+q,label,defaultValue:selected.includes(q)}))]:[]),
     text('languages','Idioma principal e preferências extras','pt-BR','Configure o idioma do aparelho manualmente (padrão pt-BR). A ordem será: primeiro idioma, idioma original da obra no TMDB, depois os demais. Legendas não comprovam áudio.'),
-    select('resultMode','Agrupamento dos resultados',[['Por qualidade e idioma','per_language'],['Por qualidade','per_quality'],['Todas as fontes válidas','all']],'per_language'),
+    select('resultMode','Agrupamento dos resultados',[['Por qualidade e idioma','per_language'],['Por qualidade','per_quality'],['Todas as fontes válidas','all']],QUALITY_PROFILE?'all':'per_language'),
     text('resultsPerGroup','Fontes por grupo','1','De 1 a 20; padrão 1. Ignorado em Todas as fontes válidas. Áudio múltiplo entra no grupo de maior preferência, sem duplicar a URL.'),
     select('languageMode','Filtro de idioma',[['Preferir','prefer'],['Somente preferências e idioma original','strict'],['Qualquer idioma, sem preferência','any']],'prefer'),
     {type:'toggle',key:'allowUnknownLanguage',label:'Aceitar áudio sem idioma informado',defaultValue:true},
@@ -102,8 +117,14 @@ function onSettings() {
     select('unknownRating','Título sem classificação',[['Bloquear','block'],['Permitir','allow']],'block','Aplicado quando há classificações permitidas configuradas.'),
     text('totalTimeoutMs','Prazo de seleção (ms)','6500','De 500 a 20000 ms; inclui TMDB e fontes. O runtime do app pode aguardar requisições pendentes além desse prazo.'),
     text('settleMs','Janela após primeira fonte (ms)','650','0 para concluir a seleção imediatamente; maior dá chance a outros idiomas/qualidades.'),
-    text('advancedJson','Configuração avançada JSON','{"sourceConcurrency":4,"maxCandidates":48}','Ajustes descritos no README. Se definir qualities aqui, prevalece sobre os botões. Testes de vídeo permanecem desativados, inclusive com configurações antigas. Não coloque chaves em presets publicados.'),
-    {type:'info',label:'Este plugin Kazuji retorna links HTTP de vídeo. No Mobile, TorBox do app resolve torrents de add-ons HTTP. TV tem contratos diferentes e requer a versão HTTP deste agregador. O plugin não acessa credenciais TorBox. Usa TMDB_API_KEY do app para título, créditos, idioma original e classificação.'},
+    text('advancedJson','Configuração avançada JSON','{"sourceConcurrency":4,"maxCandidates":96}',QUALITY_PROFILE?'Ajustes descritos no README. A qualidade deste fornecedor é fixa. Testes de vídeo permanecem desativados.':'Ajustes descritos no README. Se definir qualities aqui, prevalece sobre os botões. Testes de vídeo permanecem desativados.'),
+    {type:'info',label:'Aceita links HTTP de vídeo de qualquer fonte, inclusive TorBox/outros debrid. Com a chave acima, resolve hashes em cache diretamente na API TorBox. A chave global do Nuvio não é importada automaticamente. Usa TMDB_API_KEY do app para metadados.'},
+    {type:'header',label:'Fontes embutidas · ativação e manifestos configurados'},
+    {type:'info',label:'URLs configuradas substituem o manifesto público da respectiva fonte. Preencher uma URL ativa a fonte por padrão; um botão salvo como desativado prevalece. Fontes sem configuração e manifestos indisponíveis não impedem as demais.'},
+    ...KazujiCatalog.sources.flatMap(source=>[
+      {type:'toggle',key:'sourceEnabled_'+source.id,label:source.name,defaultValue:source.enabled || source.kind!=='direct',description:source.kind==='direct'?'Fonte HTTP pública; URL personalizada opcional.':source.kind==='torrent'?'Ativa com sua chave TorBox; aceita também manifesto personalizado com links HTTP.':'Ativa depois de preencher o manifesto configurado no add-on original. A chave TorBox não substitui o login/configuração exigido pela fonte.'},
+      text('sourceManifest_'+source.id,source.name+' · manifesto configurado','https://addon/configuracao/manifest.json','Configuração: '+source.url+' · Opcional para fontes públicas. Use a URL completa do manifesto; não a página /configure.'),
+    ]),
   ];
 }
 module.exports={getStreams,onSettings};
