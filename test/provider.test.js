@@ -3,9 +3,9 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-function sandbox(settings,fetch,defaults={},stats=[]){
-  const context=vm.createContext({module:{exports:{}},console:{info(message){stats.push(JSON.parse(message.slice('[Kazuji] '.length)));},warn(){}},setTimeout,clearTimeout,AbortController,Uint8Array,TextEncoder,TMDB_API_KEY:'key',KAZUJI_DEFAULT_CONFIG:defaults,SCRAPER_SETTINGS:settings,fetch});
-  vm.runInContext(fs.readFileSync(require.resolve('../providers/kazuji.js'),'utf8'),context);
+function sandbox(settings,fetch,defaults={},stats=[],filename='../providers/kazuji.js'){
+  const context=vm.createContext({module:{exports:{}},console:{info(message){stats.push(JSON.parse(message.slice('[Kazuji] '.length)));},warn(){}},setTimeout,clearTimeout,AbortController,Uint8Array,TextEncoder,TMDB_API_KEY:'key',KAZUJI_DEFAULT_CONFIG:{useBuiltInSources:false,...defaults},SCRAPER_SETTINGS:settings,fetch});
+  vm.runInContext(fs.readFileSync(require.resolve(filename),'utf8'),context);
   return context.module.exports;
 }
 test('generated plugin exports the current Nuvio contract and settings schema',()=>{
@@ -13,7 +13,7 @@ test('generated plugin exports the current Nuvio contract and settings schema',(
   const fields=plugin.onSettings();assert.ok(fields.some(x=>x.key==='manifests'));assert.ok(fields.some(x=>x.key==='allowedRatings'));
   assert.equal(fields.some(x=>['probeMode','probeTimeoutMs','allowUnverified'].includes(x.key)),false);
   for(const field of fields)assert.ok(['header','info','text','select','toggle'].includes(field.type));
-  const manifest=require('../manifest.json');assert.equal(manifest.scrapers[0].hasSettings,true);assert.equal(manifest.scrapers[0].filename,'providers/kazuji.js');
+  const manifest=require('../manifest.json');assert.equal(manifest.scrapers[0].hasSettings,true);assert.equal(manifest.scrapers[0].filename,'qualities/4k/provider.js');
 });
 test('runs generated bundle without Node imports using the native fetch response shape',async()=>{
   const calls=[];
@@ -98,4 +98,56 @@ test('native settings accept a configured manifest with internal commas',async()
   const url='https://torrentio.strem.fun/qualityfilter=threed,480p,scr,cam,unknown|torbox=TEST_ONLY/manifest.json';
   const rows=await qualityPlugin({manifests:url,qualities:'1080'}).getStreams('123','movie');
   assert.deepEqual(Array.from(rows,row=>row.quality),['1080p']);
+});
+
+test('combined and standalone manifests expose suppliers named after each quality and load colocated bundles',()=>{
+  const path=require('node:path'),manifest=require('../manifest.json');
+  assert.deepEqual(manifest.scrapers.map(s=>s.name),['4K','Full HD','HD','SD','Qualidade desconhecida']);
+  for(const scraper of manifest.scrapers){
+    const standalone=require('../'+scraper.filename.replace('provider.js','manifest.json'));
+    assert.equal(standalone.scrapers.length,1);assert.equal(standalone.scrapers[0].id,scraper.id);
+    assert.equal(standalone.scrapers[0].filename,'provider.js');
+    const own=path.resolve(__dirname,'..',scraper.filename);
+    assert.equal(fs.existsSync(own),true);
+    const plugin=sandbox({},()=>{}, {},[], '../'+scraper.filename);
+    assert.equal(plugin.onSettings().some(field=>/^quality\d+$/.test(field.key||'')),false);
+    assert.equal(plugin.onSettings().some(field=>field.key==='torboxApiKey'),true);
+  }
+});
+
+test('each quality bundle returns only its own quality even with old toggles and conflicting advanced JSON',async()=>{
+  const manifest=require('../manifest.json'),qualities=['4K','1080p','720p','480p','Qualidade desconhecida'];
+  const fetch=async url=>{
+    const data=url.includes('themoviedb')?{imdb_id:'tt123'}:url.endsWith('manifest.json')?
+      {id:'source',resources:['stream'],types:['movie'],idPrefixes:['tt']}:
+      {streams:[2160,1080,720,480,0].flatMap(q=>[1,2].map(n=>({quality:q,title:'PT-BR',url:'https://media.example/'+q+'-'+n+'.mp4'})))};
+    return {status:200,url,headers:{get:()=>null},arrayBuffer:async()=>new Uint8Array(0).buffer,text:async()=>JSON.stringify(data)};
+  };
+  for(const [index,scraper] of manifest.scrapers.entries()){
+    const settings={manifests:'https://source.example/manifest.json',quality2160:true,quality1080:false,qualities:[2160],advancedJson:'{"qualities":[]}',settleMs:0};
+    const rows=await sandbox(settings,fetch,{},[],'../'+scraper.filename).getStreams('123','movie');
+    assert.equal(rows.length,2);assert.deepEqual(Array.from(rows,row=>row.quality),[qualities[index],qualities[index]]);
+  }
+});
+
+test('native generated bundle passes TorBox POST bodies and returns resolved HTTP without leaking the key',async()=>{
+  const hash='a'.repeat(40),key='TEST_KEY_NOT_A_CREDENTIAL',calls=[];
+  const fetch=async(url,options)=>{
+    calls.push({url,options});let data;
+    if(url.includes('api.torbox.app')){
+      assert.equal(options.headers.Authorization,'Bearer '+key);
+      if(url.includes('checkcached')){assert.deepEqual(JSON.parse(options.body),{hashes:[hash]});data={[hash]:{hash}};}
+      if(url.includes('createtorrent')){assert.match(options.body,/name="magnet"/);data={torrent_id:4};}
+      if(url.includes('mylist'))data={id:4,hash,files:[{id:9,name:'Movie.1080p.mkv',size:12345}]};
+      if(url.includes('requestdl'))data='https://cdn.example/film.mkv';
+      data={success:true,data};
+    }else if(url.includes('themoviedb'))data={imdb_id:'tt123'};
+    else if(url.endsWith('manifest.json'))data={id:'source',resources:['stream'],types:['movie'],idPrefixes:['tt']};
+    else data={streams:[{infoHash:hash,title:'Movie 1080p Dublado',fileIdx:0}]};
+    return {status:200,url,headers:{get:()=>null},arrayBuffer:async()=>new Uint8Array(0).buffer,text:async()=>JSON.stringify(data)};
+  };
+  const rows=await sandbox({torboxApiKey:key,manifests:'https://source.example/manifest.json',settleMs:0},fetch,{},[],'../qualities/full-hd/provider.js').getStreams('123','movie');
+  assert.equal(rows.length,1);assert.equal(rows[0].url,'https://cdn.example/film.mkv');
+  assert.equal(rows[0].quality,'1080p');assert.equal(JSON.stringify(rows).includes(key),false);
+  assert.equal(calls.some(c=>c.url.startsWith('https://cdn.example')),false);
 });

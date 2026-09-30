@@ -1,5 +1,7 @@
 # Auditoria do contrato Nuvio
 
+**Atualização Kazuji 1.2.0:** os novos fornecedores por qualidade usam uma chave TorBox explícita em `SCRAPER_SETTINGS` para consultar cache e devolver links HTTP pela API. Isso não usa nem altera a guarda de debrid do app discutida abaixo. Não exige servidor HTTP no Mobile compatível. Consulte [TORBOX.md](TORBOX.md) e [SOURCES.md](SOURCES.md). As seções sobre fontes cadastradas manualmente e qualidades em toggles descrevem o adaptador legado; os novos perfis têm catálogo embutido e qualidade fixa.
+
 Revisão em 29/09/2026, com fontes oficiais fixadas em commits para permitir reprodução:
 
 - NuvioMobile `cmp-rewrite`: `c1065d0a2a717d7dba445257f064f3fb8d1b30a3`.
