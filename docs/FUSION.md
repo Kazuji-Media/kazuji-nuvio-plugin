@@ -18,4 +18,16 @@ Os 20 filtros da base mantêm seus IDs, nomes, ícones, `tagColor`, `textColor` 
 
 O endpoint HTTP só adapta o host dos SVGs complementares quando `PUBLIC_URL` está definido. Não modifica as URLs dos ícones originais.
 
+## Revisão visual 1.1.6
+
+As capturas do aparelho mostravam complementos menores e com uma moldura interna em comparação aos ícones originais. Os ícones mantidos em cache podiam continuar exibindo a versão colorida anterior.
+
+A revisão preserva os 20 ícones da base e reaproveita também WEB-DL, SDR e 6.1 das mesmas coleções. Os 31 complementos restantes usam marcas brancas mais altas, símbolos de vídeo/áudio/canais/edição e fundo transparente. A borda e o preenchimento ficam a cargo do Nuvio, evitando duas molduras. Director’s Cut usa o símbolo de tesoura com `DC`; Multi Audio usa o símbolo de áudio com `MULTI` para manter legibilidade.
+
+Os glifos são contornos vetoriais de DejaVu Sans Condensed Bold, com os avisos da fonte em `assets/fusion/LICENSE-DejaVu.txt`. O Node gera os SVGs a partir de `src/fusion-glyphs.json`, sem depender de fontes instaladas no aparelho ou no servidor. O script Python opcional `scripts/extract-fusion-glyphs.py` permite regenerar os contornos. Cada nova imagem tem o sufixo `-v2.svg` para invalidar o cache do artwork anterior.
+
+![Prévia dos complementos](fusion-preview.png)
+
+A prévia foi renderizada localmente com as proporções dos chips; a apresentação final depende do renderer do Nuvio. As regras de detecção, nomes dos emblemas e quantidade total continuam iguais.
+
 Após atualizar o pacote no servidor ou no GitHub Pages, importe novamente a mesma URL nas configurações Fusion do Nuvio para substituir as regras já salvas.

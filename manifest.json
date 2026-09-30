@@ -1,13 +1,13 @@
 {
   "name": "Kazuji Media",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Agrega add-ons HTTP e seleciona fontes por qualidade e preferência de áudio.",
   "author": "joaovpimenta",
   "scrapers": [
     {
       "id": "kazuji-media",
       "name": "Kazuji Media",
-      "version": "1.1.5",
+      "version": "1.1.6",
       "filename": "providers/kazuji.js",
       "supportedTypes": [
         "movie",
