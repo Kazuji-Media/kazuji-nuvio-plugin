@@ -17,7 +17,7 @@
       "hasSettings": true,
       "description": "Fontes automáticas · SD. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
-      "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
+      "logo": "https://raw.githubusercontent.com/joaovpimenta/Kazuji/main/kazuji.png"
     }
   ]
 }

@@ -17,7 +17,7 @@
       "hasSettings": true,
       "description": "Fontes automáticas · 4K. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
-      "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
+      "logo": "https://raw.githubusercontent.com/joaovpimenta/Kazuji/main/kazuji.png"
     },
     {
       "id": "kazuji-full-hd",
@@ -32,7 +32,7 @@
       "hasSettings": true,
       "description": "Fontes automáticas · Full HD. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
-      "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
+      "logo": "https://raw.githubusercontent.com/joaovpimenta/Kazuji/main/kazuji.png"
     },
     {
       "id": "kazuji-hd",
@@ -47,7 +47,7 @@
       "hasSettings": true,
       "description": "Fontes automáticas · HD. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
-      "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
+      "logo": "https://raw.githubusercontent.com/joaovpimenta/Kazuji/main/kazuji.png"
     },
     {
       "id": "kazuji-sd",
@@ -62,7 +62,7 @@
       "hasSettings": true,
       "description": "Fontes automáticas · SD. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
-      "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
+      "logo": "https://raw.githubusercontent.com/joaovpimenta/Kazuji/main/kazuji.png"
     },
     {
       "id": "kazuji-unknown",
@@ -77,7 +77,7 @@
       "hasSettings": true,
       "description": "Fontes automáticas · Qualidade desconhecida. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.",
       "supportsExternalPlayer": true,
-      "logo": "https://joaovpimenta.github.io/kazuji-media/assets/logo.svg"
+      "logo": "https://raw.githubusercontent.com/joaovpimenta/Kazuji/main/kazuji.png"
     }
   ]
 }
