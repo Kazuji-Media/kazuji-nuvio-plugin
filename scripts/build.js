@@ -22,7 +22,7 @@ function bundle(relative,profile){
 function scraper(profile,filename){return{
   id:'kazuji-'+profile.id,name:profile.name,version,filename,supportedTypes:['movie','tv'],enabled:profile.enabled,hasSettings:true,
   description:'Fontes automáticas · '+profile.name+'. HTTP direto e add-ons TorBox com uma única API key. Nuvio Mobile Full 0.5.4-beta ou runtime compatível.',
-  supportsExternalPlayer:true,logo:'https://raw.githubusercontent.com/joaovpimenta/Kazuji/main/kazuji.png',
+  supportsExternalPlayer:true,logo:'https://joaovpimenta.github.io/kazuji-media/assets/logo-nuvio.jpg',
 };}
 const json=value=>JSON.stringify(value,null,2)+'\n';
 const repository=scrapers=>({name:'Kazuji Media',version,description:'Fontes embutidas, TorBox e fornecedores separados por qualidade.',author:'joaovpimenta',scrapers});
