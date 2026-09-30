@@ -209,6 +209,13 @@ test('reported Mbps breaks speed ties without approving a source or overriding m
   }});
   assert.match((await measured.run()).streams[0].url,/slow$/);
 });
+test('disabled probing performs no media requests and does not consume the probe budget',async()=>{
+  const streams={'a.example':Array.from({length:30},(_,i)=>stream(1080,'https://video.example/'+i))};
+  const s=setup({streams,config:{probeMode:'off',allowUnverified:true,resultMode:'all',maxProbes:1}});
+  const result=await s.run();
+  assert.equal(result.streams.length,30);assert.equal(result.stats.probes,0);
+  assert.equal(s.calls.some(x=>x.url.startsWith('https://video.example/')),false);
+});
 test('ambiguous speed units are ignored and other audio never outranks preferred audio for speed',async()=>{
   const s=setup({meta:{original_language:'ja'},streams:{'a.example':[
     stream(1080,'https://video.example/ja',{title:'1080p Japanese',speedMbps:500}),

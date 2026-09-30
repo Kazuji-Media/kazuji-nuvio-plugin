@@ -355,6 +355,10 @@ function createAggregator(options) {
           c.health={verified:false,method:'Nuvio/TorBox',deferred:true};
           fallback.set(c.key,c);
           if (!firstTimer) firstTimer=setTimeout(finish,config.settleMs);
+        } else if (config.probeMode==='off') {
+          c.health={verified:false,method:'desativado'};
+          fallback.set(c.key,c);
+          if (config.allowUnverified && !firstTimer) firstTimer=setTimeout(finish,config.settleMs);
         } else queue.push(c);
       }
       pump();

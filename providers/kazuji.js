@@ -356,6 +356,10 @@ function createAggregator(options) {
           c.health={verified:false,method:'Nuvio/TorBox',deferred:true};
           fallback.set(c.key,c);
           if (!firstTimer) firstTimer=setTimeout(finish,config.settleMs);
+        } else if (config.probeMode==='off') {
+          c.health={verified:false,method:'desativado'};
+          fallback.set(c.key,c);
+          if (config.allowUnverified && !firstTimer) firstTimer=setTimeout(finish,config.settleMs);
         } else queue.push(c);
       }
       pump();
@@ -586,8 +590,13 @@ async function getStreams(tmdbId,mediaType,season,episode) {
     if(!extra || typeof extra!=='object' || Array.isArray(extra))throw new Error('Configuração avançada inválida');
     Object.assign(settings,extra);
   }
+  // Video requests can keep Nuvio's native evaluation alive until its timeout.
+  // Apply after presets, saved settings and advanced JSON so old values cannot
+  // re-enable sampling/HEAD or suppress all links as unverified.
+  settings.probeMode='off';
+  settings.allowUnverified=true;
   const config=KazujiCore.normalizeConfig(settings);
-  const engine=KazujiCore.createAggregator({request:nativeTransport(config.sourceConcurrency+config.probeConcurrency),output:'native',tmdbApiKey:globalThis.TMDB_API_KEY||''});
+  const engine=KazujiCore.createAggregator({request:nativeTransport(config.sourceConcurrency+1),output:'native',tmdbApiKey:globalThis.TMDB_API_KEY||''});
   const result=await engine.aggregate({id:String(tmdbId),type:mediaType,season,episode},config);
   console.info('[Kazuji] '+JSON.stringify(result.stats));
   return result.streams;
@@ -600,7 +609,7 @@ function onSettings() {
   return [
     {type:'header',label:'Kazuji · Agregador'},
     {type:'info',label:typeof setTimeout==='function' && typeof clearTimeout==='function'
-      ? 'Requer Nuvio Mobile Full 0.5.4-beta ou runtime compatível. O app pode aguardar requisições de vídeo até o próprio timeout, mesmo após o prazo do plugin. Se ficar carregando ou der erro, desative o teste da fonte e permita alternativas sem velocidade aprovada; isso mantém a busca e os filtros, sem medir velocidade.'
+      ? 'Requer Nuvio Mobile Full 0.5.4-beta ou runtime compatível. Consulta manifestos e metadados em paralelo, sem testar ou baixar vídeos. Ordena por qualidade, idioma e velocidade informada pela fonte, quando disponível. A reprodução confirma a disponibilidade do link.'
       : 'Este runtime não oferece os timers exigidos. No Mobile, atualize para Nuvio Full 0.5.4-beta ou runtime compatível. No TV, use o add-on HTTP Kazuji.'},
     text('manifests','Manifestos Stremio HTTP','https://addon.exemplo/manifest.json','Separe URLs por vírgula, ou use um array JSON. Inclua a configuração do próprio add-on na URL. Não aceita repositórios de plugins JavaScript.'),
     {type:'header',label:'Qualidades de vídeo · selecione uma ou mais'},
@@ -616,12 +625,9 @@ function onSettings() {
     text('allowedRatings','Classificações permitidas','L,10,12','Vazio desativa o filtro. Use os códigos do país escolhido. Padrão BR: L,10,12,14,16,18. Bloqueia todo o título quando não permitido.'),
     text('country','País da classificação','BR','Código ISO: BR, US, GB, etc. Padrão BR.'),
     select('unknownRating','Título sem classificação',[['Bloquear','block'],['Permitir','allow']],'block','Aplicado quando há classificações permitidas configuradas.'),
-    select('probeMode','Teste da fonte',[['Amostra de vídeo','sample'],['Apenas disponibilidade HTTP','head'],['Desativado','off']],'sample','Só a amostra mede velocidade. No Mobile, requisições lentas podem prender o runtime até o timeout do app. Desativado precisa de alternativas sem velocidade aprovada para mostrar links.'),
-    {type:'toggle',key:'allowUnverified',label:'Aceitar alternativas sem velocidade aprovada',defaultValue:false,description:'Pode devolver fontes lentas ou não verificadas. Identificação no nome/descrição.'},
-    text('totalTimeoutMs','Prazo total (ms)','6500','De 500 a 20000 ms; inclui consulta TMDB, fontes e testes.'),
-    text('settleMs','Janela após primeiro aprovado (ms)','650','0 para devolver imediatamente; maior dá chance a outros idiomas/qualidades.'),
-    text('probeTimeoutMs','Prazo por amostra (ms)','1400','De 100 a 5000 ms.'),
-    text('advancedJson','Configuração avançada JSON','{"probeConcurrency":4,"minMbps":{"2160":20,"1080":6}}','Permite ajustar todos os campos descritos no README. Se definir qualities aqui, prevalece sobre os botões. Não coloque chaves em presets publicados.'),
+    text('totalTimeoutMs','Prazo de seleção (ms)','6500','De 500 a 20000 ms; inclui TMDB e fontes. O runtime do app pode aguardar requisições pendentes além desse prazo.'),
+    text('settleMs','Janela após primeira fonte (ms)','650','0 para concluir a seleção imediatamente; maior dá chance a outros idiomas/qualidades.'),
+    text('advancedJson','Configuração avançada JSON','{"sourceConcurrency":4,"maxCandidates":48}','Ajustes descritos no README. Se definir qualities aqui, prevalece sobre os botões. Testes de vídeo permanecem desativados, inclusive com configurações antigas. Não coloque chaves em presets publicados.'),
     {type:'info',label:'Este plugin Kazuji retorna links HTTP de vídeo. No Mobile, TorBox do app resolve torrents de add-ons HTTP. TV tem contratos diferentes e requer a versão HTTP deste agregador. O plugin não acessa credenciais TorBox. Usa TMDB_API_KEY do app para título, créditos, idioma original e classificação.'},
   ];
 }
