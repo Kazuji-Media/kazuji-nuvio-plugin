@@ -80,7 +80,7 @@ A partir da 1.1.4, o Kazuji prepara os termos de resolução, fonte (REMUX/BluRa
 Em **Nuvio → Configurações → Streams → URLs de emblemas Fusion**, importe uma vez:
 
 ```text
-https://joaovpimenta.github.io/kazuji-media/badges.json
+https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-colletions/main/badges.json
 ```
 
 O pacote 1.1.5 deriva da [base indicada pelo usuário](https://pastebin.com/raw/mduTTf4M): preserva os 20 ícones originais, cores e bordas, e acrescenta 34 complementos monocromáticos para fonte, codec, áudio, canais, edição e idiomas. As resoluções ficam ativas por padrão; as regras aceitam os rótulos de três linhas e mostram Atmos junto do codec conhecido. Os metadados também funcionam com outros pacotes cujas regras reconheçam esses termos. Veja [a origem e os ajustes](docs/FUSION.md).
