@@ -16,7 +16,7 @@ Os 20 filtros da base mantêm seus IDs, nomes, ícones, `tagColor`, `textColor` 
 
 `src/fusion-extra.json` define os complementos. `scripts/build-badges.js` aplica os ajustes documentados e gera `badges.json` e os SVGs complementares. `npm run build` gera pacote e plugin; `npm run check` verifica ambos. Os 20 SVGs coloridos antigos que foram substituídos pelos ícones originais foram removidos.
 
-O endpoint HTTP só adapta o host dos SVGs complementares quando `PUBLIC_URL` está definido. Não modifica as URLs dos ícones originais.
+Os 31 SVGs complementares usam URLs raw do repositório atual `Kazuji-Media/kazuji-nuvio-plugin`, sem depender do antigo GitHub Pages. O endpoint HTTP adapta essas URLs para `/assets/fusion/` no próprio host quando `PUBLIC_URL` está definido. Não modifica as URLs dos ícones originais.
 
 ## Revisão visual 1.1.6
 
@@ -31,3 +31,11 @@ Os glifos são contornos vetoriais de DejaVu Sans Condensed Bold, com os avisos 
 A prévia foi renderizada localmente com as proporções dos chips; a apresentação final depende do renderer do Nuvio. As regras de detecção, nomes dos emblemas e quantidade total continuam iguais.
 
 Após atualizar o pacote no servidor ou no GitHub Pages, importe novamente a mesma URL nas configurações Fusion do Nuvio para substituir as regras já salvas.
+
+## Correção de URLs e idiomas
+
+Os arquivos existentes foram preservados; a troca do host também altera a chave de cache das imagens no Nuvio. Reimporte `https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/badges.json` após a atualização para substituir as URLs salvas.
+
+Os emblemas de idioma correspondem apenas à lista declarada depois de `Áudio:` ou `Audio:`. Aceitam códigos regionais com hífen ou underscore, como `en-US` e `pt_BR`, e não tratam listas de legendas como áudio. PT-BR permanece separado de PT.
+
+`npm run check:badge-images` requer Python 3 e acesso à rede. Verifica as 54 URLs publicadas com GET, segue redirecionamentos e valida o tipo e o conteúdo PNG/SVG. A CI executa essa verificação além dos testes locais; uma indisponibilidade dos repositórios externos pode fazê-la falhar. A verificação HTTP não substitui a confirmação visual no aparelho.
