@@ -247,6 +247,17 @@ Os testes cobrem corridas, prazo máximo, fontes penduradas, concorrência, dedu
 
 Não houve teste em aparelho Nuvio nem reprodução real com uma conta TorBox nesta entrega. A integração usa contratos auditados no código dos aplicativos, documentados abaixo.
 
+## Créditos dos emblemas Fusion
+
+O pacote de emblemas inclui artwork e referências das seguintes fontes. Os links permitem consultar os projetos e arquivos originais:
+
+- **[nobnobz — Omni-Template-Bot-Bid-Raiser](https://github.com/nobnobz/Omni-Template-Bot-Bid-Raiser):** origem dos ícones de resolução, HDR, áudio e outros metadados da [coleção white regex tags](https://github.com/nobnobz/Omni-Template-Bot-Bid-Raiser/tree/main/Other/white%20regex%20tags).
+- **[9mousaa — BetterFormatter](https://github.com/9mousaa/BetterFormatter):** origem dos ícones Remux, BluRay e WEB-DL, disponíveis na [pasta images](https://github.com/9mousaa/BetterFormatter/tree/main/images).
+- **[DejaVu Fonts](https://dejavu-fonts.github.io/):** a fonte DejaVu Sans Condensed Bold foi usada nos textos dos emblemas complementares. Os avisos de copyright e a licença estão preservados em [LICENSE-DejaVu.txt](assets/fusion/LICENSE-DejaVu.txt).
+- **[Pacote de regras de referência](https://pastebin.com/raw/mduTTf4M):** base histórica dos filtros e estilos, preservada em [badges.base.json](badges.base.json).
+
+Os arquivos utilizados foram incorporados ao repositório e padronizados em PNG branco com fundo transparente. Os créditos aos projetos de origem permanecem; o carregamento dos emblemas usa somente as cópias deste repositório. A procedência de cada imagem está registrada em [src/fusion-images.json](src/fusion-images.json), e o processo de geração está descrito em [docs/FUSION.md](docs/FUSION.md).
+
 ## Referências
 
 - [Auditoria Nuvio: entradas, saídas e integrações](docs/NUVIO.md)

@@ -35,25 +35,23 @@ function matchedFusionNames(row){
     return new RegExp(f.pattern.replace(/^\(\?[is]+\)/,''),flags?flags[1]:'').test(text);
   }).map(f=>f.name);
 }
-test('derived Fusion pack preserves reference artwork and colors with enabled resolution defaults',()=>{
+test('derived Fusion pack preserves reference names and colors with enabled resolution defaults',()=>{
   const base=require('../badges.base.json'),derived=require('../badges.json');
   assert.equal(base.filters.length,20);assert.equal(derived.filters.length,54);
   assert.equal(new Set(derived.filters.map(f=>f.id)).size,54);
   for(const original of base.filters){
     const filter=derived.filters.find(f=>f.id===original.id);assert.ok(filter,original.id);
-    for(const key of ['name','imageURL','borderColor','tagColor','textColor'])assert.equal(filter[key],original[key],original.id+': '+key);
+    for(const key of ['name','borderColor','tagColor','textColor'])assert.equal(filter[key],original[key],original.id+': '+key);
     assert.equal(filter.isEnabled,true);assert.equal(filter.tagStyle,'filled');
   }
   assert.equal(base.filters.filter(f=>!f.isEnabled).length,3);
 });
-test('polished complements reuse collection icons and version font-independent vector artwork',()=>{
-  const fs=require('node:fs'),path=require('node:path'),pack=require('../badges.json');
-  for(const name of ['WEB-DL','SDR','6.1'])assert.ok(pack.filters.find(f=>f.name===name).imageURL.startsWith('https://raw.githubusercontent.com/'));
-  const local=pack.filters.filter(f=>f.imageURL.startsWith('https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/'));
-  assert.equal(local.length,31);
-  for(const filter of local){
-    const asset=new URL(filter.imageURL).pathname.split('/').pop();assert.match(asset,/-v2\.svg$/);
-    const svg=fs.readFileSync(path.join(__dirname,'../assets/fusion',asset),'utf8');
+test('custom vector sources remain font-independent for PNG regeneration',()=>{
+  const fs=require('node:fs'),path=require('node:path');
+  const sources=require('../src/fusion-images.json').filter(image=>image.source.endsWith('.svg'));
+  assert.equal(sources.length,31);
+  for(const image of sources){
+    const svg=fs.readFileSync(path.join(__dirname,'..',image.source),'utf8');
     assert.doesNotMatch(svg,/<text\b|font-family/);assert.match(svg,/height="80"/);assert.match(svg,/<path\b/);
   }
 });

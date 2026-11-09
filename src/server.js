@@ -44,16 +44,16 @@ async function createServer(options={}) {
       if(req.method==='GET'&&url.pathname==='/badges.json'){
         const badges=JSON.parse(await fs.readFile(path.join(__dirname,'../badges.json'),'utf8'));
         if(publicUrl)for(const filter of badges.filters){
-          // Preserve original third-party PNG URLs from the reference pack.
+          // Serve every bundled badge from this server when PUBLIC_URL is set.
           const prefix='https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/';
           if(filter.imageURL.startsWith(prefix))filter.imageURL=new URL('/assets/fusion/'+filter.imageURL.slice(prefix.length),publicUrl).href;
         }
         send(200,badges);return;
       }
-      if(req.method==='GET'&&/^\/assets\/(?:logo\.svg|fusion\/[a-z0-9-]+\.svg)$/.test(url.pathname)){
+      if(req.method==='GET'&&/^\/assets\/(?:logo\.svg|fusion\/[a-z0-9-]+\.(?:svg|png))$/.test(url.pathname)){
         let asset;
         try{asset=await fs.readFile(path.join(__dirname,'..',url.pathname.slice(1)));}catch(_){send(404,{error:'Emblema não encontrado'});return;}
-        res.writeHead(200,{'Content-Type':'image/svg+xml','Cache-Control':'public, max-age=86400'});res.end(asset);return;
+        res.writeHead(200,{'Content-Type':url.pathname.endsWith('.png')?'image/png':'image/svg+xml','Cache-Control':'public, max-age=86400'});res.end(asset);return;
       }
       if(req.method==='GET'&&['/','/configure'].includes(url.pathname)||req.method==='GET'&&/^\/c\/[a-f0-9]{48}\/configure$/.test(url.pathname)){
         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'"});res.end(await fs.readFile(path.join(__dirname,'../public/index.html')));return;

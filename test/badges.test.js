@@ -9,11 +9,17 @@ function languages(text){
   ).map(f=>f.name);
 }
 
-test('custom badge images use the current repository instead of the retired Pages host',()=>{
-  const custom=pack.filters.filter(f=>f.imageURL.endsWith('.svg'));
-  assert.equal(custom.length,31);
-  for(const badge of custom)assert.equal(badge.imageURL,
-    'https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/'+badge.id+'-v2.svg');
+test('all badge images are local uniform PNGs in the current repository',()=>{
+  const fs=require('node:fs'),path=require('node:path');
+  assert.equal(pack.filters.length,54);
+  for(const badge of pack.filters){
+    assert.equal(badge.imageURL,
+      'https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/'+badge.id+'-v3.png');
+    const image=fs.readFileSync(path.join(__dirname,'../assets/fusion',badge.id+'-v3.png'));
+    assert.equal(image.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+    assert.equal(image.readUInt32BE(20),80);
+    assert.equal(image[25],6,'RGBA PNG with alpha');
+  }
 });
 
 test('language badges only match codes in an audio metadata list',()=>{

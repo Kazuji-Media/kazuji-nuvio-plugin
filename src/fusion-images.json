@@ -1,0 +1,380 @@
+[
+  {
+    "id": "r-4k",
+    "source": "assets/fusion/sources/r-4k.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_4k.png",
+    "sourceSha256": "2d12f224c91056a88a52f59c7860b90ddfcef4001b2a42a0d9bc64fa520cfee8",
+    "pngSha256": "6d9ef4e8b3cc46785d4800abb34599ec725fcdf35f4e446e19d6dd5e3bfcaf55"
+  },
+  {
+    "id": "r-1080",
+    "source": "assets/fusion/sources/r-1080.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_1080p.png",
+    "sourceSha256": "5d896e76191ae4e4ce3ac384754b72f9c117a314d824d8a4350ebf7946782bca",
+    "pngSha256": "815e689b7af33f4d6aab657f47d41f34c9b568fb0755681923dc5d95b79bd92f"
+  },
+  {
+    "id": "r-720",
+    "source": "assets/fusion/sources/r-720.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_720p.png",
+    "sourceSha256": "ea13b692cd0cf5c9f8f28cec8446bc64796c0ab6a37d15688a25a1200bfae7f2",
+    "pngSha256": "9b973665b1ab65a8b5e3523ba16ebfff0ae4c857cc83a599d93acc3b02a3216a"
+  },
+  {
+    "id": "q-r",
+    "source": "assets/fusion/sources/q-r.png",
+    "upstreamURL": "https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/images/mono-remux.png",
+    "sourceSha256": "9e1a9567b5c6098d9316b41226c3ebe8802f5356b32d8f31005c38277333bc23",
+    "pngSha256": "263369451f1582da6b04b146343562844699e05c5e1e606cb59d9b23696ea891"
+  },
+  {
+    "id": "q-b",
+    "source": "assets/fusion/sources/q-b.png",
+    "upstreamURL": "https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/images/mono-bluray.png",
+    "sourceSha256": "8558fe3cb793bb0b910caefdf0c647dfa901839c6f99c8e908e326c7ce0f3424",
+    "pngSha256": "5a143ff767da4242783fdadf0594a3cd9345b71c16e8c76111852c669d24e4d6"
+  },
+  {
+    "id": "v-imax",
+    "source": "assets/fusion/sources/v-imax.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_imax.png",
+    "sourceSha256": "4def00668517272abba95248a62cfdde6b04a22561d6253b28cbfe78c164b929",
+    "pngSha256": "d3d6f50e81e9d540ca51a3ee85b36f02f516a0c5f81f6738c6020fc8ddee3265"
+  },
+  {
+    "id": "a-dv",
+    "source": "assets/fusion/sources/a-dv.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_DV.png",
+    "sourceSha256": "8d97308bbef194b21de012f735f1d2cd7f2d64e225cd24cc2e3d9939599d93dd",
+    "pngSha256": "2f4f073a22fabb84fd4bba44c2f608925905d6938a4e6f6da2bb91aa25a39f6d"
+  },
+  {
+    "id": "v-hdr10p",
+    "source": "assets/fusion/sources/v-hdr10p.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_HDR10Plus.png",
+    "sourceSha256": "dad866b82c296bd87e35530da10bd11b804154a2d6fd4f463f5196458d5f3938",
+    "pngSha256": "4b02699dc307c2757d58fbc6b481817bcfc2c99ef883e88146957fa671183fd6"
+  },
+  {
+    "id": "v-hdr10",
+    "source": "assets/fusion/sources/v-hdr10.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_HDR10.png",
+    "sourceSha256": "6957e3798768a963a87f2e93353dfd685121ca7e3118c7d52e3ce89bbe921844",
+    "pngSha256": "2365027ffad8674b38bc2651b032d1bb2667fbc2e9adca2aad3c5363f7fb5656"
+  },
+  {
+    "id": "v-hdr",
+    "source": "assets/fusion/sources/v-hdr.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_HDR.png",
+    "sourceSha256": "d069dae6cf8e347ea86766f9057a0aa5dc82863e0fae078da5ba5b7ea3b4954b",
+    "pngSha256": "216c516e8a9c0f264c0afc1094de7d3aaf26ed8da457ffee1ce44de8e44ef099"
+  },
+  {
+    "id": "a-at",
+    "source": "assets/fusion/sources/a-at.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_Atmos.png",
+    "sourceSha256": "f639e1e04e8d3c1be39a7b4d881de8973f318890bc63f2c9b3eff43684e5358c",
+    "pngSha256": "18a7cad025b357113ab83923818dc095d6c0fa8b09ef9c349a8962e1a9701056"
+  },
+  {
+    "id": "a-th",
+    "source": "assets/fusion/sources/a-th.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_TrueHD.png",
+    "sourceSha256": "16c021455ea32ca1a50c20323318ac6363c8214e415e822f365039f0f92f64c9",
+    "pngSha256": "07eb9c9bf82195b233bba4e627b74244d8d559288d0a705cb1ea08ff7812cff8"
+  },
+  {
+    "id": "a-dp",
+    "source": "assets/fusion/sources/a-dp.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_DDPLUS.png",
+    "sourceSha256": "c1e4e07688a86224262eefb9d7a7934feae6c04503ea4bc4f629df5d65af474c",
+    "pngSha256": "df5152b1ed3eb5b582f56a50e3ac657e73eb78979a60ee4142dbb7169e91b945"
+  },
+  {
+    "id": "a-dd",
+    "source": "assets/fusion/sources/a-dd.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_DD.png",
+    "sourceSha256": "e4f06ad1b08f31de7f66bedfe431e2adbfde11f3a1baee6dea51101a947cdfc6",
+    "pngSha256": "80a0124186bc240aa37c3e80b6fb237bad583ae3ac0123175193ba3677bf13c8"
+  },
+  {
+    "id": "a-dtsx",
+    "source": "assets/fusion/sources/a-dtsx.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_dtsx.png",
+    "sourceSha256": "f802efcf9c7d2350b06d126a247864ab26cc23810b25e10102dd7af1e0f0cef3",
+    "pngSha256": "551189544b2e1b4a59684c87f557cef63af8615f0a156a2e053010c7977b32bf"
+  },
+  {
+    "id": "a-dtsma",
+    "source": "assets/fusion/sources/a-dtsma.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_dtsHDMA.png",
+    "sourceSha256": "fe542a8277b0443cae4edadf3734ced065930ed75111596dd649f8a95505775c",
+    "pngSha256": "83902b11b2c75c96eedf77824689b13690b48bb115533077db03a6d2f3f38029"
+  },
+  {
+    "id": "a-dtshd",
+    "source": "assets/fusion/sources/a-dtshd.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_dtsHD.png",
+    "sourceSha256": "d95b96f209151bbe481b1c06b6472462b6d78449f1021ba57fac27c09de2b4d5",
+    "pngSha256": "ca3de8808f0dfdc807dc556907f5f7cfd863debb0e2d9dd6386eb1ba02006b00"
+  },
+  {
+    "id": "a-dts",
+    "source": "assets/fusion/sources/a-dts.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_dts.png",
+    "sourceSha256": "6b70999056dcd848279e7967685a7fae682656afc54a68d1bead086c94ee5fc7",
+    "pngSha256": "b44d39142f958049aae7db8b40d9f71950dab64bcb94e6d1a74339592e24ba35"
+  },
+  {
+    "id": "ch-71",
+    "source": "assets/fusion/sources/ch-71.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_71.png",
+    "sourceSha256": "35e7443e4d3a0fcfccdb01ed2944570e47cd82c0e560e9650074e55fe8e575f0",
+    "pngSha256": "7bc22896b2d393dec2b6156f997862b8b1c0c382a0b9939c3e69b18226784faf"
+  },
+  {
+    "id": "ch-51",
+    "source": "assets/fusion/sources/ch-51.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_51.png",
+    "sourceSha256": "2f4f9b10da854eabb2d59ae5e61fafe48c3f4a9166fdcc1ccc02ab212b1fa94c",
+    "pngSha256": "dbc73350ca3343dbb102f7d768874520e5a791fd789e58ebc68c579e382991d4"
+  },
+  {
+    "id": "480p",
+    "source": "assets/fusion/480p-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/480p-v2.svg",
+    "sourceSha256": "3ccc862c6b1fd72c8cd7f9972a2f293b949fea75971796cda9e8070779da1315",
+    "pngSha256": "5d2cfb64cc94efe7ada4d5f5441a2a18bd7de0b9608e9a3ea9e2b1513f8d89a1"
+  },
+  {
+    "id": "web-dl",
+    "source": "assets/fusion/sources/web-dl.png",
+    "upstreamURL": "https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/images/mono-webdl.png",
+    "sourceSha256": "1d7d2ce635d970ee71ac79273a9efcacfea01ac5576f382d53ca95d0bae28eb4",
+    "pngSha256": "272c47d094adcc118e975c88ddb508468a1b570e4640420be9a945a83497fccf"
+  },
+  {
+    "id": "webrip",
+    "source": "assets/fusion/webrip-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/webrip-v2.svg",
+    "sourceSha256": "5a85797ef4313433692fe06870ffde9764c0a17278aac729201aa9b7a1c26f83",
+    "pngSha256": "17e64280dd082dea8ae32289c6d25d9ed3d3ee709e9bcc60e40d6152d8a01993"
+  },
+  {
+    "id": "hdcam",
+    "source": "assets/fusion/hdcam-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/hdcam-v2.svg",
+    "sourceSha256": "8631912bca411fda95222393f42a31fc9df45f88592ce32a6b78ca1cc1a047a4",
+    "pngSha256": "fc499861385042cde004966ccc93f69f5057a919f307dbacfe678fac934e3c85"
+  },
+  {
+    "id": "dvdrip",
+    "source": "assets/fusion/dvdrip-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/dvdrip-v2.svg",
+    "sourceSha256": "c9132ba35785358f1534328deafdccabdf0bf391d9c535b3e07de34f3df14843",
+    "pngSha256": "77395daf23906db15a5d5c8ffcf70e35bbe3b495e2b5139d35620dcb46242404"
+  },
+  {
+    "id": "hevc",
+    "source": "assets/fusion/hevc-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/hevc-v2.svg",
+    "sourceSha256": "ea2057e8d56c35a59842c0a726a7cead27d7a44c130b2fc292039dfcbfb80026",
+    "pngSha256": "db2897e5801b2acbf8ea9ae8960e376a9b98d913bcfd2d7995152019e4c9114b"
+  },
+  {
+    "id": "avc",
+    "source": "assets/fusion/avc-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/avc-v2.svg",
+    "sourceSha256": "74ab3cee79041afac0a99916cba70c2b85ac59dd7f90c47bac87e1b10bdd2acc",
+    "pngSha256": "26207097fc4cf79717432607eb50a523e8f084a476eb98e775a6ed15a952f82f"
+  },
+  {
+    "id": "av1",
+    "source": "assets/fusion/av1-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/av1-v2.svg",
+    "sourceSha256": "4a8e030437c3b3624d8b50c4b4c89ec0e237a9ebf342d84ddae05a3e56ea7564",
+    "pngSha256": "c7cbdb88b18c13e4a5fac0457efafbeb92658917c3b048e0d09263711d994d20"
+  },
+  {
+    "id": "vp9",
+    "source": "assets/fusion/vp9-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/vp9-v2.svg",
+    "sourceSha256": "66c39ae52b566dab197b7735ec962667dab10fbc65cbc644b2fb8db886463363",
+    "pngSha256": "9de3472aa7c1641b6dcd3ae87b1a739dfe33095ce586387e89f2f4e4bcb8056c"
+  },
+  {
+    "id": "hlg",
+    "source": "assets/fusion/hlg-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/hlg-v2.svg",
+    "sourceSha256": "a7631bd0f564ba256628046f7346e627d53f5f368183a980bb8cd7e84a8bec14",
+    "pngSha256": "72f47d9ee0b6551508c12bee654e000b9d03f4bbe8e34826417befad15a329f0"
+  },
+  {
+    "id": "sdr",
+    "source": "assets/fusion/sources/sdr.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_sdr.png",
+    "sourceSha256": "5e07e97a8f8a5e1bf41a26d3e2a2f99183f1f875355ffb5ee5e1f64f26d358c9",
+    "pngSha256": "c126533cff5165d60e2bd089086a58a86bf85132b866856a9e83ca708592f0d3"
+  },
+  {
+    "id": "aac",
+    "source": "assets/fusion/aac-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/aac-v2.svg",
+    "sourceSha256": "4cd2ab2290339a8d3ff5056ce610ad1c3e2fb819bd020bafd0fadf5d3deb9d04",
+    "pngSha256": "45fda5d50e9a5b7bbac84a5ff217508a96294add3d754c5ba54bb9a623ffdb67"
+  },
+  {
+    "id": "flac",
+    "source": "assets/fusion/flac-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/flac-v2.svg",
+    "sourceSha256": "74fd93e0d3071a96eb8d7a4075f8f7c9f1d9d4f5a2b91fac3ef24014ac580598",
+    "pngSha256": "5ff0a802f9bfd80ec899f93fde42b7708ebd8f38fc690ef50fa17cdbc868efb6"
+  },
+  {
+    "id": "pcm",
+    "source": "assets/fusion/pcm-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/pcm-v2.svg",
+    "sourceSha256": "a8b77ce3b98dd629c7b279d0dce7e5d428e79bc46e9cecee100bf6bbb4812afb",
+    "pngSha256": "9c1cf4afa29d5032682526ebb626d094ad4f5173b335987b02c16b8e5fb45752"
+  },
+  {
+    "id": "mp3",
+    "source": "assets/fusion/mp3-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/mp3-v2.svg",
+    "sourceSha256": "85d3f7d0e194747ab6450310f29429b63d14870cf044797bd1e06a0630f3ca7d",
+    "pngSha256": "ca8394b803995d197551d15cd64f6f682d3f3d967c331e8bb942116487f92149"
+  },
+  {
+    "id": "6-1",
+    "source": "assets/fusion/sources/6-1.png",
+    "upstreamURL": "https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/white%20regex%20tags/white_61.png",
+    "sourceSha256": "286a3c7a97064ee3c0a056d44bb254c98928b79d2a55d3eee9dea6235dd4be83",
+    "pngSha256": "94a0bd95a69461883a2a6e67d38c43dd8cf1d7bbf4ffadf5bb014bd78ce0305c"
+  },
+  {
+    "id": "2-0",
+    "source": "assets/fusion/2-0-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/2-0-v2.svg",
+    "sourceSha256": "57addc82e9dcdf6205149e9345a1dc134aa45ed2eca1279a6910f834bec11771",
+    "pngSha256": "4d1ead6bdf0a9b02832dbf4d630171eaa44680e8f43026de2a3a10269fdce819"
+  },
+  {
+    "id": "1-0",
+    "source": "assets/fusion/1-0-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/1-0-v2.svg",
+    "sourceSha256": "91a6d589c693db5cf1504d77de0e34bd5c777e24ef73d6e1a8c65ae409488f7e",
+    "pngSha256": "ae9a3ad0d45be91373835d414ee173716f614ad1eda52769b76462f8cbe99439"
+  },
+  {
+    "id": "extended",
+    "source": "assets/fusion/extended-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/extended-v2.svg",
+    "sourceSha256": "af32fe50346e9216efa8f92c5bfc6dd12f363a018031388ae2105412a150dbb3",
+    "pngSha256": "58b9482d60dc4df6e1c842d982744482ef8afc0adf70df874aeb5bfd3acd0188"
+  },
+  {
+    "id": "director-s-cut",
+    "source": "assets/fusion/director-s-cut-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/director-s-cut-v2.svg",
+    "sourceSha256": "2065a2ce075863e19a14f0ffcc7494cfc65691c097e33f9945caff97ef230687",
+    "pngSha256": "3b2e63eb92e08cd5a712637b2a1e0b03b624b9d8b356e3b1a0474b355982d001"
+  },
+  {
+    "id": "proper",
+    "source": "assets/fusion/proper-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/proper-v2.svg",
+    "sourceSha256": "e9c6ff37e2ebb44e0a21080354bfd494b3ee3961cded419bab768d913907bb71",
+    "pngSha256": "ff9a3f4852db7f86c120ede4ec738fb25d9a427f8d6b30a3b6099f8f753867ad"
+  },
+  {
+    "id": "repack",
+    "source": "assets/fusion/repack-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/repack-v2.svg",
+    "sourceSha256": "99c212a15fd628a48cd770719f71b4cd2ba37d98842de534c6dff6561b454253",
+    "pngSha256": "5f09c584d3a89d71f33c35f90030e4cd39fa6de8f2888e100f22a6616b71f87c"
+  },
+  {
+    "id": "10bit",
+    "source": "assets/fusion/10bit-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/10bit-v2.svg",
+    "sourceSha256": "b719d71bddd2fc8ee7eb5fb9258d5ea1e104ddbbdd671dcab2fcd727acc87009",
+    "pngSha256": "2febbe10a864f80af99316b7534e9081a4de380ae1948bd18f1d719161a6bfbc"
+  },
+  {
+    "id": "12bit",
+    "source": "assets/fusion/12bit-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/12bit-v2.svg",
+    "sourceSha256": "0f4a65a624eb112474c2f4a016bd9c2c2a46272d8468674d66c8bc5f3a372a85",
+    "pngSha256": "b4699816ee6dcfe19877bebe6f4c1938b3df90ee2c0e9661ce4deb76ab457bd9"
+  },
+  {
+    "id": "pt-br",
+    "source": "assets/fusion/pt-br-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/pt-br-v2.svg",
+    "sourceSha256": "52235da043143bd3cac5867066378630b75426cf844708a0f7b9114554aa6acc",
+    "pngSha256": "7d655e7a479d902880b49ac0c0db31478a95c8125cda6ca1b2527c3f9d083238"
+  },
+  {
+    "id": "multi-audio",
+    "source": "assets/fusion/multi-audio-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/multi-audio-v2.svg",
+    "sourceSha256": "1be7d0944037453544bb324cf34354f996bf4bc45c97f2921dfda931cc3b7bf5",
+    "pngSha256": "220c363b598157e177f4986f365c834d7c976dc1313d3ef21c84057cb60e28e4"
+  },
+  {
+    "id": "audio-en",
+    "source": "assets/fusion/audio-en-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/audio-en-v2.svg",
+    "sourceSha256": "e1003f4980f4ee1523b65de5feaee27712511cc08996ae307c697ca8b4a20045",
+    "pngSha256": "815730043cdcbb8f12e88dd872d1d388eec40b80cac77d3f761833febbe4c1ef"
+  },
+  {
+    "id": "audio-ja",
+    "source": "assets/fusion/audio-ja-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/audio-ja-v2.svg",
+    "sourceSha256": "c21a6c47842993d8b8424e6ebf7808386d657ba63ff4c3abfe4121d5822ddf91",
+    "pngSha256": "b3c300f5e20501c02b2bc66f53fab3f2702bdcca040f55f81160334f9b6f410d"
+  },
+  {
+    "id": "audio-es",
+    "source": "assets/fusion/audio-es-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/audio-es-v2.svg",
+    "sourceSha256": "54f4604878be06de3405e34cd410c5c3c760db05569a73f0bcdce326cf03ab1f",
+    "pngSha256": "ee69d5ef1eeccf00f1c973a62d52c2948a76a0c885b15affd2d61cf9d0f06a06"
+  },
+  {
+    "id": "audio-fr",
+    "source": "assets/fusion/audio-fr-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/audio-fr-v2.svg",
+    "sourceSha256": "4330aca274f55da0b068e783d65531111aae14e4dce1f9f99f9f54abc077e0f8",
+    "pngSha256": "2e89c57731d53ad3b95475b0b54eb67a8e793d6615514c53dd959b1b85012c36"
+  },
+  {
+    "id": "audio-de",
+    "source": "assets/fusion/audio-de-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/audio-de-v2.svg",
+    "sourceSha256": "3b4e1f838f9fe9f2a98a9026d2bf74145666895daab2d3b9e2503eff7bccfd31",
+    "pngSha256": "eac797a3414995c067c9a6b3df53ac0c0493ba9d803339cf37e1c2f831c9327a"
+  },
+  {
+    "id": "audio-it",
+    "source": "assets/fusion/audio-it-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/audio-it-v2.svg",
+    "sourceSha256": "b62869fd9f37a6da6eeca91f44691017be2bab9d958a50e788381dba95ca7051",
+    "pngSha256": "ee5a0c362054870438e672494c17be34c80b946fb9e2f4963d1ec45ad7558e55"
+  },
+  {
+    "id": "audio-ru",
+    "source": "assets/fusion/audio-ru-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/audio-ru-v2.svg",
+    "sourceSha256": "17c757fb84502508f3ec5bbb1f3a26e47e476237b49c0cb680ab657e98cb9af4",
+    "pngSha256": "e146f8920cf2ac4b12190bb6c3f8c4c0e5909401530c310e1abe05fa7688327a"
+  },
+  {
+    "id": "audio-pt",
+    "source": "assets/fusion/audio-pt-v2.svg",
+    "upstreamURL": "https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/audio-pt-v2.svg",
+    "sourceSha256": "580e2074d196fa37890da6371b6a94806590ec3406720562c7460131500ab03e",
+    "pngSha256": "42551b1707e074cf57283321cd4d620bdacda4d4494817e2943959f536669ed1"
+  }
+]
