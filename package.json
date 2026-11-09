@@ -7,6 +7,7 @@
   "scripts": {
     "build": "node scripts/build-badges.js && node scripts/build.js",
     "build:badges": "node scripts/build-badges.js",
+    "check:badge-images": "python3 scripts/check-badge-images.py",
     "test": "node --test test/*.test.js",
     "check": "node scripts/build-badges.js --check && node scripts/build.js --check",
     "start": "node src/server.js"

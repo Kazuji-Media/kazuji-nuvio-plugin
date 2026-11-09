@@ -65,7 +65,7 @@ for(const filter of extra.filters){
   const derived={...filter,borderColor:template.borderColor,tagColor:template.tagColor,
     tagStyle:'filled',textColor:template.textColor,type:'filter'};
   filters.push(derived);addGroup(derived.groupId,groupNames.get(derived.groupId)||derived.name,template);
-  if(derived.imageURL.startsWith('https://joaovpimenta.github.io/kazuji-media/')){
+  if(derived.imageURL.startsWith('https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/')){
     // Versioned URLs prevent Coil from retaining the previous small, boxed art.
     // Outlined glyphs render identically without depending on device fonts.
     files.set('assets/fusion/'+derived.id+'-v2.svg',artwork(derived));

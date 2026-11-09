@@ -45,8 +45,8 @@ async function createServer(options={}) {
         const badges=JSON.parse(await fs.readFile(path.join(__dirname,'../badges.json'),'utf8'));
         if(publicUrl)for(const filter of badges.filters){
           // Preserve original third-party PNG URLs from the reference pack.
-          const prefix='https://joaovpimenta.github.io/kazuji-media/';
-          if(filter.imageURL.startsWith(prefix))filter.imageURL=new URL('/'+filter.imageURL.slice(prefix.length),publicUrl).href;
+          const prefix='https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/';
+          if(filter.imageURL.startsWith(prefix))filter.imageURL=new URL('/assets/fusion/'+filter.imageURL.slice(prefix.length),publicUrl).href;
         }
         send(200,badges);return;
       }

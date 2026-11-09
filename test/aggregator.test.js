@@ -49,7 +49,7 @@ test('derived Fusion pack preserves reference artwork and colors with enabled re
 test('polished complements reuse collection icons and version font-independent vector artwork',()=>{
   const fs=require('node:fs'),path=require('node:path'),pack=require('../badges.json');
   for(const name of ['WEB-DL','SDR','6.1'])assert.ok(pack.filters.find(f=>f.name===name).imageURL.startsWith('https://raw.githubusercontent.com/'));
-  const local=pack.filters.filter(f=>f.imageURL.startsWith('https://joaovpimenta.github.io/kazuji-media/'));
+  const local=pack.filters.filter(f=>f.imageURL.startsWith('https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/'));
   assert.equal(local.length,31);
   for(const filter of local){
     const asset=new URL(filter.imageURL).pathname.split('/').pop();assert.match(asset,/-v2\.svg$/);

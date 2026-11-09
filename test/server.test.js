@@ -61,13 +61,16 @@ test('end-to-end configured addon works with two local upstreams and no TorBox a
   assert.ok(badges.filters.length>=40);
   const reference=require('../badges.base.json');
   for(const original of reference.filters)assert.equal(badges.filters.find(f=>f.id===original.id).imageURL,original.imageURL);
+  let localBadgeCount=0;
   for(const badge of badges.filters){
     const asset=new URL(badge.imageURL);
     if(asset.origin==='https://raw.githubusercontent.com')continue;
+    localBadgeCount++;
     assert.equal(asset.origin,'https://kazuji.example');
     const icon=await fetch(host+asset.pathname);assert.equal(icon.status,200);assert.match(icon.headers.get('content-type'),/image\/svg\+xml/);
     assert.match(await icon.text(),/<svg/);
   }
+  assert.equal(localBadgeCount,31);
   assert.equal((await fetch(host+'/assets/fusion/missing.svg')).status,404);
   assert.equal((await fetch(host+'/assets/logo.svg')).status,200);
   const invalid=await fetch(host+manifestPath.replace('manifest.json','stream/movie/garbage.json'));assert.equal(invalid.status,400);
