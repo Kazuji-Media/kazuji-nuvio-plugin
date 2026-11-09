@@ -1,11 +1,14 @@
 'use strict';
 const fs=require('node:fs');
 const path=require('node:path');
+const {createHash}=require('node:crypto');
 const root=path.resolve(__dirname,'..');
 // Immutable reference from https://pastebin.com/raw/mduTTf4M.
 const base=JSON.parse(fs.readFileSync(path.join(root,'badges.base.json'),'utf8'));
 const extra=JSON.parse(fs.readFileSync(path.join(root,'src/fusion-extra.json'),'utf8'));
 const font=JSON.parse(fs.readFileSync(path.join(root,'src/fusion-glyphs.json'),'utf8'));
+const images=JSON.parse(fs.readFileSync(path.join(root,'src/fusion-images.json'),'utf8'));
+const imageById=new Map(images.map(image=>[image.id,image]));
 const filters=base.filters.map(filter=>({...filter,isEnabled:true,tagStyle:'filled',
   // Nuvio stream labels span three lines. Anchored upstream rules need DOTALL.
   pattern:filter.pattern.replace(/^\(\?i\)/,'(?is)')}));
@@ -65,11 +68,27 @@ for(const filter of extra.filters){
   const derived={...filter,borderColor:template.borderColor,tagColor:template.tagColor,
     tagStyle:'filled',textColor:template.textColor,type:'filter'};
   filters.push(derived);addGroup(derived.groupId,groupNames.get(derived.groupId)||derived.name,template);
-  if(derived.imageURL.startsWith('https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/assets/fusion/')){
+  if(imageById.get(derived.id).source.endsWith('.svg')){
     // Versioned URLs prevent Coil from retaining the previous small, boxed art.
     // Outlined glyphs render identically without depending on device fonts.
     files.set('assets/fusion/'+derived.id+'-v2.svg',artwork(derived));
   }
+}
+// Rasterization refreshes the vector sources before exporting the PNGs.
+if(process.argv.includes('--sources-only')){
+  for(const [file,content]of files)fs.writeFileSync(path.join(root,file),content);
+  console.log('Fusion: '+files.size+' fontes SVG atualizadas');
+  return;
+}
+for(const filter of filters){
+  const image=imageById.get(filter.id);
+  const file='assets/fusion/'+filter.id+'-v3.png';
+  filter.imageURL='https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/'+file;
+  const png=fs.readFileSync(path.join(root,file));
+  const source=files.get(image.source)||fs.readFileSync(path.join(root,image.source));
+  const sha=data=>createHash('sha256').update(data).digest('hex');
+  if(sha(source)!==image.sourceSha256||sha(png)!==image.pngSha256)
+    throw new Error('PNG Fusion desatualizado: regenere com scripts/render-badge-pngs.py');
 }
 files.set('badges.json',JSON.stringify({filters,groups},null,2)+'\n');
 for(const [file,content]of files){

@@ -15,3 +15,5 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run check:badge-images
+        env:
+          BADGE_IMAGE_REF: ${{ github.head_ref || github.ref_name }}

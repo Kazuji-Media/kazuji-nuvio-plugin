@@ -1,41 +1,36 @@
-# Pacote Fusion derivado
+# Pacote Fusion autocontido
 
-A versão 1.1.5 usa como referência https://pastebin.com/raw/mduTTf4M, consultada em 30/09/2026. A cópia recebida está em `badges.base.json`, sem alterações nas regras ou estados originais. O campo de teste `text` do primeiro filtro também foi preservado nessa referência.
+O pacote contém 54 emblemas em PNG RGBA, com desenho branco, fundo transparente, altura de 80 pixels e proporções preservadas. Todas as URLs de `badges.json` apontam para `assets/fusion/*-v3.png` neste repositório. O Nuvio não consulta repositórios de terceiros para carregar os emblemas.
 
-Os 20 filtros da base mantêm seus IDs, nomes, ícones, `tagColor`, `textColor` e `borderColor` no pacote derivado. Os ícones originais continuam referenciados nos repositórios [nobnobz/Omni-Template-Bot-Bid-Raiser](https://github.com/nobnobz/Omni-Template-Bot-Bid-Raiser) e [9mousaa/BetterFormatter](https://github.com/9mousaa/BetterFormatter). Os novos ícones seguem a apresentação monocromática branca, com fundo transparente e o estilo discreto da base aplicado pelo Nuvio.
+## Fontes e geração
 
-## Ajustes na derivação
+- `badges.base.json` é a referência histórica recebida de https://pastebin.com/raw/mduTTf4M. Permanece intacta, incluindo as URLs originais, apenas como entrada de regras e estilos. O gerador substitui todas essas URLs no pacote final.
+- `src/fusion-extra.json` define os 34 filtros complementares.
+- `src/fusion-images.json` registra os 54 arquivos de origem, sua procedência e os hashes SHA-256 das fontes e dos PNGs publicados.
+- `assets/fusion/sources/` contém cópias locais dos 23 PNGs originalmente usados das coleções de [nobnobz](https://github.com/nobnobz/Omni-Template-Bot-Bid-Raiser) e [9mousaa](https://github.com/9mousaa/BetterFormatter). Os créditos e URLs de origem são registros de procedência, não dependências de execução.
+- Os 31 SVGs `assets/fusion/*-v2.svg` são fontes vetoriais locais dos demais badges. Usam contornos DejaVu Sans Condensed Bold; os avisos da fonte estão em `assets/fusion/LICENSE-DejaVu.txt`.
+- `scripts/build-badges.js` gera `badges.json` e as fontes SVG. Confere os hashes dos PNGs e das fontes para impedir que artwork desatualizado seja publicado.
 
-- Ativa 4K, 1080p e 720p, desativados na referência. As demais opções continuam ativas.
-- Usa `filled` com `borderColor` para aplicar preenchimento e borda no renderer atual do Nuvio Mobile, que testa `tagStyle == "filled"`.
-- Acrescenta DOTALL aos filtros com `(?i)` para aceitar os rótulos de várias linhas do Kazuji, incluindo as regras ancoradas de HDR10/HDR10+.
-- Separa IMAX da qualidade da fonte, Atmos do codec de áudio e Dolby Vision da camada HDR. Permite mostrar TrueHD/DD+ junto de Atmos, e HDR10 junto de Dolby Vision quando ambos foram declarados; mantém as demais regras de prioridade da base.
-- Restringe os emblemas 7.1 e 5.1 aos canais declarados: 8.0 não é 7.1, e 5.0 não é 5.1.
-- Acrescenta 34 filtros para os metadados complementares: 480p, WEB-DL/WEBRip/HDCAM/DVDRip, codecs, HLG/SDR, AAC/FLAC/PCM/MP3, canais restantes, edições, profundidade de cor e idiomas.
-- Mantém desconhecidos sem emblema. Não adiciona consultas de mídia ou importação automática nas configurações do Nuvio.
+O build normal e os testes usam apenas arquivos locais e não precisam do Inkscape, do Pillow nem de baixar imagens.
 
-`src/fusion-extra.json` define os complementos. `scripts/build-badges.js` aplica os ajustes documentados e gera `badges.json` e os SVGs complementares. `npm run build` gera pacote e plugin; `npm run check` verifica ambos. Os 20 SVGs coloridos antigos que foram substituídos pelos ícones originais foram removidos.
+Para regenerar os PNGs após alterar o artwork, instale Python 3, Pillow e Inkscape. Execute `npm run render:badges` e depois `npm run build:badges`. O comando de conversão atualiza primeiro as fontes SVG pelo gerador, incluindo mudanças nos glifos e símbolos. A conversão usa os originais locais, preserva o canal alfa e normaliza altura e cor. Revise as imagens e os novos hashes no commit.
 
-Os 31 SVGs complementares usam URLs raw do repositório atual `Kazuji-Media/kazuji-nuvio-plugin`, sem depender do antigo GitHub Pages. O endpoint HTTP adapta essas URLs para `/assets/fusion/` no próprio host quando `PUBLIC_URL` está definido. Não modifica as URLs dos ícones originais.
+## Regras e servidor HTTP
 
-## Revisão visual 1.1.6
+Os IDs, nomes, cores e agrupamentos foram preservados. A derivação ativa as resoluções da base, usa `filled` para bordas/preenchimento e DOTALL para rótulos de várias linhas. IMAX, Atmos e Dolby Vision mantêm grupos próprios; Atmos pode aparecer com o codec e Dolby Vision com HDR10 declarado. Canais 7.1/5.1 não são inferidos de 8.0/5.0. Metadados desconhecidos continuam sem emblema.
 
-As capturas do aparelho mostravam complementos menores e com uma moldura interna em comparação aos ícones originais. Os ícones mantidos em cache podiam continuar exibindo a versão colorida anterior.
+Os emblemas de idioma correspondem à lista depois de `Áudio:` ou `Audio:`, aceitam códigos regionais com hífen ou underscore e não confundem listas de legendas com áudio. PT-BR permanece separado de PT.
 
-A revisão preserva os 20 ícones da base e reaproveita também WEB-DL, SDR e 6.1 das mesmas coleções. Os 31 complementos restantes usam marcas brancas mais altas, símbolos de vídeo/áudio/canais/edição e fundo transparente. A borda e o preenchimento ficam a cargo do Nuvio, evitando duas molduras. Director’s Cut usa o símbolo de tesoura com `DC`; Multi Audio usa o símbolo de áudio com `MULTI` para manter legibilidade.
+Quando `PUBLIC_URL` está definido, o endpoint HTTP reescreve as 54 URLs para `/assets/fusion/` no próprio servidor e responde com `image/png`. As fontes SVG antigas continuam acessíveis para compatibilidade com imports anteriores.
 
-Os glifos são contornos vetoriais de DejaVu Sans Condensed Bold, com os avisos da fonte em `assets/fusion/LICENSE-DejaVu.txt`. O Node gera os SVGs a partir de `src/fusion-glyphs.json`, sem depender de fontes instaladas no aparelho ou no servidor. O script Python opcional `scripts/extract-fusion-glyphs.py` permite regenerar os contornos. Cada nova imagem tem o sufixo `-v2.svg` para invalidar o cache do artwork anterior.
+## Validação e instalação
 
-![Prévia dos complementos](fusion-preview.png)
+`npm run check` verifica os arquivos gerados e hashes. `npm test` cobre as regras, o formato PNG e o carregamento dos 54 arquivos pelo servidor HTTP.
 
-A prévia foi renderizada localmente com as proporções dos chips; a apresentação final depende do renderer do Nuvio. As regras de detecção, nomes dos emblemas e quantidade total continuam iguais.
+`npm run check:badge-images` usa Python 3 e acesso à rede para conferir GET, MIME e SHA-256 das imagens publicadas. Por padrão testa `main`; `BADGE_IMAGE_REF` permite testar outra branch. A CI usa a branch da PR, permitindo validar imagens novas antes do merge. A verificação depende apenas deste repositório no GitHub.
 
-Após atualizar o pacote no servidor ou no GitHub Pages, importe novamente a mesma URL nas configurações Fusion do Nuvio para substituir as regras já salvas.
+Após o merge, reimporte `https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/badges.json` nas configurações Fusion do Nuvio. Os nomes `-v3.png` renovam as chaves de cache. Não há importação automática.
 
-## Correção de URLs e idiomas
+![Prévia dos 54 PNGs](fusion-preview.png)
 
-Os arquivos existentes foram preservados; a troca do host também altera a chave de cache das imagens no Nuvio. Reimporte `https://raw.githubusercontent.com/Kazuji-Media/kazuji-nuvio-plugin/main/badges.json` após a atualização para substituir as URLs salvas.
-
-Os emblemas de idioma correspondem apenas à lista declarada depois de `Áudio:` ou `Audio:`. Aceitam códigos regionais com hífen ou underscore, como `en-US` e `pt_BR`, e não tratam listas de legendas como áudio. PT-BR permanece separado de PT.
-
-`npm run check:badge-images` requer Python 3 e acesso à rede. Verifica as 54 URLs publicadas com GET, segue redirecionamentos e valida o tipo e o conteúdo PNG/SVG. A CI executa essa verificação além dos testes locais; uma indisponibilidade dos repositórios externos pode fazê-la falhar. A verificação HTTP não substitui a confirmação visual no aparelho.
+A prévia foi gerada com os arquivos finais. A confirmação visual no aparelho Nuvio ainda é necessária.
